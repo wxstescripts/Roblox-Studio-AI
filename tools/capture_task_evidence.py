@@ -127,6 +127,9 @@ def generate_html_gallery(data, remote_info):
                 </div>
             """)
 
+        task_num = tid.replace("Task-", "").replace("Task_", "")
+        report_link_html = f'<span class="report-tag">Report: <a href="../reports/index.html?task={task_num}" class="link-btn" style="font-size: 11px; margin-left: 4px;">📄 Read Task {task_num} Report</a></span>' if report else ''
+
         task_cards_html.append(f"""
             <section class="task-section" id="{tid.replace('.', '_')}">
                 <div class="task-header">
@@ -136,7 +139,7 @@ def generate_html_gallery(data, remote_info):
                     </div>
                     <div class="task-header-meta">
                         <span class="timestamp-tag">Captured: {ts}</span>
-                        {f'<span class="report-tag">Report: <code>{report}</code></span>' if report else ''}
+                        {report_link_html}
                     </div>
                 </div>
                 {f'<p class="task-notes">{notes}</p>' if notes else ''}
@@ -550,14 +553,27 @@ def generate_html_gallery(data, remote_info):
                     <h1 class="brand-title">⛏ PET MINING EMPIRE</h1>
                     <p class="brand-subtitle">Task Evidence & Verified Viewport Review Gallery</p>
                 </div>
-                <div class="stats-panel">
-                    <div class="stat-chip">
-                        <span class="val">{len(data)}</span>
-                        <span class="lbl">Tasks Indexed</span>
+                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                    <div class="nav-pills" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                        <a href="index.html" class="nav-pill" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 6px; font-size: 13px; font-weight: 700; text-decoration: none; border: 1px solid var(--accent-cyan); background: var(--accent-cyan); color: #000;">
+                            📷 Screenshot Gallery
+                        </a>
+                        <a href="../reports/index.html" class="nav-pill" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; text-decoration: none; border: 1px solid var(--stroke-color); background: var(--bg-card); color: var(--text-secondary);">
+                            📄 Task Reports (50)
+                        </a>
+                        <a href="https://github.com/wxstescripts/Roblox-Studio-AI" target="_blank" class="nav-pill" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; text-decoration: none; border: 1px solid var(--stroke-color); background: var(--bg-card); color: var(--text-secondary);">
+                            📁 GitHub Repo
+                        </a>
                     </div>
-                    <div class="stat-chip">
-                        <span class="val">{total_images}</span>
-                        <span class="lbl">Screenshots</span>
+                    <div class="stats-panel">
+                        <div class="stat-chip">
+                            <span class="val">{len(data)}</span>
+                            <span class="lbl">Tasks Indexed</span>
+                        </div>
+                        <div class="stat-chip">
+                            <span class="val">{total_images}</span>
+                            <span class="lbl">Screenshots</span>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Mining Empire — Task Reports & Documentation</title>
+    <style>
+        :root {
+            --bg-dark: #0A0D13;
+            --bg-panel: #11151F;
+            --bg-card: #161C27;
+            --bg-elevated: #1F2735;
+            --stroke-color: #263042;
+            --stroke-glow: rgba(0, 220, 255, 0.3);
+            --accent-cyan: #00DCFF;
+            --accent-gold: #FFCC00;
+            --accent-green: #00E676;
+            --accent-red: #FF3D71;
+            --text-primary: #FFFFFF;
+            --text-secondary: #90A0B5;
+            --text-muted: #5E6E82;
+            --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: var(--font-stack);
+            line-height: 1.6;
+            padding: 20px 16px 80px 16px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Top Brand Header */
+        header.reports-header {
+            background: linear-gradient(180deg, var(--bg-panel) 0%, rgba(17, 21, 31, 0.8) 100%);
+            border: 1px solid var(--stroke-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .brand-title {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Navigation Pills */
+        .nav-pills {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .nav-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: 1px solid var(--stroke-color);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+        }
+
+        .nav-pill:hover {
+            color: #fff;
+            border-color: var(--accent-cyan);
+            background: rgba(0, 220, 255, 0.08);
+        }
+
+        .nav-pill.active {
+            background: var(--accent-cyan);
+            color: #000;
+            border-color: var(--accent-cyan);
+            font-weight: 700;
+        }
+
+        /* Stats Strip */
+        .stats-strip {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 12px;
+            border-left: 3px solid var(--accent-gold);
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-group {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            color: var(--text-secondary);
+        }
+        .stat-item strong {
+            color: var(--accent-gold);
+            font-weight: 700;
+        }
+
+        /* Search and Filter Controls */
+        .controls-panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--stroke-color);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-input-wrap {
+            flex: 1;
+            min-width: 260px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--stroke-color);
+            border-radius: 6px;
+            padding: 10px 14px 10px 36px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px var(--stroke-glow);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 14px;
+            pointer-events: none;
+        }
+
+        .sort-select {
+            background: var(--bg-card);
+            border: 1px solid var(--stroke-color);
+            border-radius: 6px;
+            padding: 9px 12px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .filter-chips {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .filter-chip {
+            background: var(--bg-card);
+            border: 1px solid var(--stroke-color);
+            color: var(--text-secondary);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-chip:hover {
+            color: #fff;
+            border-color: var(--accent-cyan);
+        }
+
+        .filter-chip.active {
+            background: rgba(0, 220, 255, 0.15);
+            color: var(--accent-cyan);
+            border-color: var(--accent-cyan);
+        }
+
+        /* Reports Grid View */
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 16px;
+        }
+
+        .report-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--stroke-color);
+            border-radius: 10px;
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+        }
+
+        .report-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .report-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 8px;
+        }
+
+        .badge-task {
+            background: var(--accent-cyan);
+            color: #000;
+            font-size: 12px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-cat {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: var(--bg-elevated);
+            padding: 3px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--stroke-color);
+        }
+
+        .badge-evidence {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent-gold);
+            background: rgba(255, 204, 0, 0.12);
+            border: 1px solid rgba(255, 204, 0, 0.35);
+            padding: 2px 7px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .report-card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .report-card-summary {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            flex: 1;
+            margin-bottom: 14px;
+        }
+
+        .report-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .btn-read {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            background: rgba(0, 220, 255, 0.08);
+            border: 1px solid rgba(0, 220, 255, 0.25);
+            padding: 5px 12px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .report-card:hover .btn-read {
+            background: var(--accent-cyan);
+            color: #000;
+        }
+
+        /* Reader View */
+        .reader-container {
+            display: none;
+        }
+
+        .reader-container.active {
+            display: block;
+        }
+
+        .reader-toolbar {
+            background: var(--bg-panel);
+            border: 1px solid var(--stroke-color);
+            border-radius: 10px;
+            padding: 14px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            position: sticky;
+            top: 16px;
+            z-index: 100;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.6);
+        }
+
+        .btn-toolbar {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            background: var(--bg-card);
+            border: 1px solid var(--stroke-color);
+            color: var(--text-secondary);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-toolbar:hover {
+            color: #fff;
+            border-color: var(--accent-cyan);
+            background: rgba(0, 220, 255, 0.1);
+        }
+
+        .btn-toolbar.btn-primary {
+            background: rgba(0, 220, 255, 0.15);
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            font-weight: 700;
+        }
+
+        .btn-toolbar.btn-primary:hover {
+            background: var(--accent-cyan);
+            color: #000;
+        }
+
+        /* Screenshot Evidence Banner in Reader */
+        .evidence-banner {
+            background: linear-gradient(180deg, #161D2B 0%, #121622 100%);
+            border: 1px solid var(--accent-gold);
+            border-radius: 10px;
+            padding: 18px 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 16px rgba(255, 204, 0, 0.08);
+        }
+
+        .evidence-banner-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .evidence-banner-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--accent-gold);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .evidence-banner-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 14px;
+        }
+
+        .evidence-banner-thumb {
+            background: var(--bg-card);
+            border: 1px solid var(--stroke-color);
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .evidence-banner-thumb:hover {
+            transform: scale(1.02);
+            border-color: var(--accent-cyan);
+        }
+
+        .evidence-banner-thumb img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .evidence-banner-meta {
+            padding: 8px 10px;
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+        }
+
+        /* Markdown Article Styling */
+        .markdown-article {
+            background: var(--bg-panel);
+            border: 1px solid var(--stroke-color);
+            border-radius: 12px;
+            padding: 36px 40px;
+            line-height: 1.7;
+            color: #E2E8F0;
+        }
+
+        @media (max-width: 768px) {
+            .markdown-article { padding: 24px 18px; }
+            .reports-grid { grid-template-columns: 1fr; }
+        }
+
+        .markdown-article h1 {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--stroke-color);
+            padding-bottom: 12px;
+            margin-bottom: 24px;
+        }
+
+        .markdown-article h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            border-bottom: 1px solid var(--stroke-color);
+            padding-bottom: 8px;
+            margin-top: 32px;
+            margin-bottom: 16px;
+        }
+
+        .markdown-article h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent-gold);
+            margin-top: 24px;
+            margin-bottom: 12px;
+        }
+
+        .markdown-article h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-top: 18px;
+            margin-bottom: 8px;
+        }
+
+        .markdown-article p {
+            margin-bottom: 16px;
+            color: #CBD5E1;
+        }
+
+        .markdown-article ul, .markdown-article ol {
+            margin-bottom: 18px;
+            padding-left: 26px;
+        }
+
+        .markdown-article li {
+            margin-bottom: 6px;
+            color: #CBD5E1;
+        }
+
+        .markdown-article a {
+            color: var(--accent-cyan);
+            text-decoration: underline;
+        }
+
+        .markdown-article a:hover {
+            color: #fff;
+        }
+
+        .markdown-article blockquote {
+            border-left: 4px solid var(--accent-cyan);
+            background: rgba(0, 220, 255, 0.05);
+            padding: 12px 18px;
+            border-radius: 0 6px 6px 0;
+            margin-bottom: 20px;
+            color: var(--text-secondary);
+        }
+
+        .markdown-article hr {
+            border: none;
+            border-top: 1px solid var(--stroke-color);
+            margin: 28px 0;
+        }
+
+        .markdown-article table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 13px;
+            overflow-x: auto;
+            display: block;
+        }
+
+        .markdown-article th, .markdown-article td {
+            border: 1px solid var(--stroke-color);
+            padding: 10px 14px;
+            text-align: left;
+        }
+
+        .markdown-article th {
+            background: var(--bg-card);
+            color: var(--accent-cyan);
+            font-weight: 700;
+        }
+
+        .markdown-article tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .markdown-article code {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--stroke-color);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--accent-gold);
+        }
+
+        .markdown-article pre {
+            background: #080A0F;
+            border: 1px solid var(--stroke-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 18px 0;
+            overflow-x: auto;
+        }
+
+        .markdown-article pre code {
+            background: transparent;
+            border: none;
+            padding: 0;
+            color: #E2E8F0;
+            font-size: 12.5px;
+            line-height: 1.5;
+        }
+
+        /* Lightbox Modal */
+        .lightbox-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.94);
+            z-index: 9999;
+            padding: 24px;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .lightbox-modal.active { display: flex; }
+        .lightbox-img {
+            max-width: 90vw;
+            max-height: 80vh;
+            border-radius: 8px;
+            border: 1px solid var(--stroke-color);
+        }
+        .lightbox-caption {
+            margin-top: 14px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--stroke-color);
+            color: #fff;
+            font-size: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Prev / Next Task Footer */
+        .reader-nav-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 32px;
+            padding-top: 20px;
+            border-top: 1px solid var(--stroke-color);
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            background: var(--bg-panel);
+            border: 1px solid var(--stroke-color);
+            border-radius: 10px;
+            color: var(--text-secondary);
+        }
+    </style>
+    <!-- Vendored Marked.js with fallback to CDN -->
+    <script src="marked.min.js"></script>
+    <script>
+        if (typeof marked === 'undefined') {
+            document.write('<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"><\/script>');
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- Top Brand Header -->
+        <header class="reports-header">
+            <div class="header-top">
+                <div>
+                    <h1 class="brand-title">⛏ PET MINING EMPIRE</h1>
+                    <p class="brand-subtitle">Authoritative Task Engineering Reports & Architectural Documentation</p>
+                </div>
+                <div class="nav-pills">
+                    <a href="../review-gallery/index.html" class="nav-pill">
+                        📷 Screenshot Gallery
+                    </a>
+                    <a href="index.html" class="nav-pill active">
+                        📄 Task Reports (50)
+                    </a>
+                    <a href="https://github.com/wxstescripts/Roblox-Studio-AI" target="_blank" class="nav-pill">
+                        📁 GitHub Repo
+                    </a>
+                </div>
+            </div>
+            <div class="stats-strip">
+                <div class="stat-group">
+                    <span class="stat-item">Indexed Reports: <strong id="statTotal">50</strong></span>
+                    <span class="stat-item">Coverage: <strong>Tasks 1.8 – 1.57</strong></span>
+                    <span class="stat-item">Verified Evidence: <strong>6 Viewport Captures</strong></span>
+                </div>
+                <span style="color: var(--accent-green); font-weight: 600;">● Original Authoritative Artifacts</span>
+            </div>
+        </header>
+
+        <!-- Catalog View Section -->
+        <section id="catalogSection">
+            <div class="controls-panel">
+                <div class="search-row">
+                    <div class="search-input-wrap">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="reportSearch" class="search-input" placeholder="Search task ID, title, summary, topic..." oninput="handleSearch()" />
+                    </div>
+                    <select id="sortSelect" class="sort-select" onchange="handleSort()">
+                        <option value="newest">Sort: Newest First (1.57 → 1.8)</option>
+                        <option value="oldest">Sort: Oldest First (1.8 → 1.57)</option>
+                        <option value="size">Sort: Largest Report First</option>
+                    </select>
+                </div>
+                <div class="filter-chips" id="categoryChips">
+                    <button class="filter-chip active" onclick="filterCategory('All')">All Reports (50)</button>
+                    <button class="filter-chip" onclick="filterCategory('Tooling & Documentation')">Tooling & Documentation</button>
+                    <button class="filter-chip" onclick="filterCategory('UI Redesign & Design System')">UI & Design System</button>
+                    <button class="filter-chip" onclick="filterCategory('Plot Dressing & Wayfinding')">Plot Dressing</button>
+                    <button class="filter-chip" onclick="filterCategory('Environment Art Overhaul')">Environment Art</button>
+                    <button class="filter-chip" onclick="filterCategory('Pet Systems & Economy')">Pet Systems</button>
+                    <button class="filter-chip" onclick="filterCategory('Progression & Caverns')">Progression & Caverns</button>
+                    <button class="filter-chip" onclick="filterCategory('World & Environment')">World & Environment</button>
+                    <button class="filter-chip" onclick="filterCategory('Tycoon & Production')">Tycoon & Production</button>
+                </div>
+            </div>
+
+            <div class="reports-grid" id="reportsGrid">
+                <!-- Populated dynamically via JavaScript -->
+            </div>
+        </section>
+
+        <!-- Reader View Section -->
+        <section id="readerSection" class="reader-container">
+            <div class="reader-toolbar">
+                <button class="btn-toolbar btn-primary" onclick="backToCatalog()">
+                    ← Back to All Reports
+                </button>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <a id="btnViewScreenshots" href="#" class="btn-toolbar" style="display: none;">
+                        📸 View Task Screenshots
+                    </a>
+                    <button class="btn-toolbar" onclick="copyReportLink()">
+                        🔗 Copy Link
+                    </button>
+                    <a id="btnRawMarkdown" href="#" target="_blank" class="btn-toolbar">
+                        ⬇ Raw Markdown
+                    </a>
+                </div>
+            </div>
+
+            <!-- Evidence Banner for tasks with screenshots -->
+            <div id="evidenceBanner" class="evidence-banner" style="display: none;">
+                <div class="evidence-banner-header">
+                    <span class="evidence-banner-title">
+                        📸 Verified Studio Viewport Evidence
+                    </span>
+                    <a id="bannerGalleryLink" href="#" class="btn-toolbar" style="font-size: 11px; padding: 4px 10px;">
+                        Open in Full Review Gallery →
+                    </a>
+                </div>
+                <div class="evidence-banner-grid" id="evidenceBannerGrid">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Rendered Markdown Container -->
+            <article class="markdown-article" id="markdownContent">
+                <!-- Rendered Markdown goes here -->
+            </article>
+
+            <!-- Bottom Navigation Bar -->
+            <div class="reader-nav-footer">
+                <button id="btnPrevTask" class="btn-toolbar" onclick="navigateAdjacentTask(-1)">
+                    ← Previous Report
+                </button>
+                <button class="btn-toolbar" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                    ↑ Back to Top
+                </button>
+                <button id="btnNextTask" class="btn-toolbar" onclick="navigateAdjacentTask(1)">
+                    Next Report →
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Lightbox Modal -->
+    <div id="lightboxModal" class="lightbox-modal" onclick="closeLightbox(event)">
+        <button class="lightbox-close" onclick="closeLightbox(null)">✕</button>
+        <img id="lightboxImg" class="lightbox-img" src="" alt="Screenshot" />
+        <div id="lightboxCaption" class="lightbox-caption"></div>
+    </div>
+
+    <script>
+        let allReports = [];
+        let filteredReports = [];
+        let currentCategory = 'All';
+        let currentSort = 'newest';
+        let currentReportIndex = -1;
+
+        // Initialize and load reports metadata
+        async function init() {
+            try {
+                const resp = await fetch('reports_data.json');
+                allReports = await resp.json();
+            } catch (err) {
+                console.warn('Direct fetch failed, falling back to embedded or raw:', err);
+                // Try raw GitHub fetch if on file protocol
+                try {
+                    const rawResp = await fetch('https://raw.githubusercontent.com/wxstescripts/Roblox-Studio-AI/main/docs/reports/reports_data.json');
+                    allReports = await rawResp.json();
+                } catch (e2) {
+                    console.error('All metadata fetches failed:', e2);
+                }
+            }
+
+            if (!allReports || allReports.length === 0) {
+                document.getElementById('reportsGrid').innerHTML = '<div class="empty-state">Unable to load reports metadata. Please check connection.</div>';
+                return;
+            }
+
+            document.getElementById('statTotal').innerText = allReports.length;
+
+            // Handle URL Routing (?task=1.56 or ?report=task_1_56_...)
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetTask = urlParams.get('task');
+            const targetReport = urlParams.get('report');
+
+            if (targetTask) {
+                const match = allReports.find(r => r.taskId.toLowerCase() === `task-${targetTask}`.toLowerCase() || r.taskId.toLowerCase() === targetTask.toLowerCase());
+                if (match) {
+                    openReport(match);
+                    return;
+                }
+            } else if (targetReport) {
+                const match = allReports.find(r => r.filename === targetReport);
+                if (match) {
+                    openReport(match);
+                    return;
+                }
+            }
+
+            // Otherwise show catalog
+            renderCatalog();
+        }
+
+        function filterCategory(cat) {
+            currentCategory = cat;
+            const chips = document.querySelectorAll('.filter-chip');
+            chips.forEach(c => c.classList.toggle('active', c.innerText.startsWith(cat)));
+            applyFilters();
+        }
+
+        function handleSearch() {
+            applyFilters();
+        }
+
+        function handleSort() {
+            currentSort = document.getElementById('sortSelect').value;
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const query = (document.getElementById('reportSearch').value || '').toLowerCase().trim();
+
+            filteredReports = allReports.filter(r => {
+                const matchesCat = currentCategory === 'All' || r.category === currentCategory;
+                const matchesQuery = !query ||
+                    r.taskId.toLowerCase().includes(query) ||
+                    r.title.toLowerCase().includes(query) ||
+                    r.summary.toLowerCase().includes(query) ||
+                    r.category.toLowerCase().includes(query);
+                return matchesCat && matchesQuery;
+            });
+
+            if (currentSort === 'newest') {
+                filteredReports.sort((a, b) => (b.taskMajor * 1000 + b.taskMinor) - (a.taskMajor * 1000 + a.taskMinor));
+            } else if (currentSort === 'oldest') {
+                filteredReports.sort((a, b) => (a.taskMajor * 1000 + a.taskMinor) - (b.taskMajor * 1000 + b.taskMinor));
+            } else if (currentSort === 'size') {
+                filteredReports.sort((a, b) => b.sizeBytes - a.sizeBytes);
+            }
+
+            renderGrid();
+        }
+
+        function renderCatalog() {
+            applyFilters();
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('reportsGrid');
+            if (filteredReports.length === 0) {
+                grid.innerHTML = '<div class="empty-state" style="grid-column: 1 / -1;">No matching reports found for the selected query.</div>';
+                return;
+            }
+
+            grid.innerHTML = filteredReports.map(r => {
+                const sizeKb = (r.sizeBytes / 1024).toFixed(1);
+                const evidenceBadge = r.hasScreenshots 
+                    ? `<span class="badge-evidence">📸 ${r.screenshotCount} Verified Evidence</span>` 
+                    : '';
+                return `
+                    <div class="report-card" onclick="openReportByTask('${r.taskId}')">
+                        <div class="report-card-top">
+                            <span class="badge-task">${r.taskId}</span>
+                            <span class="badge-cat">${r.category}</span>
+                            ${evidenceBadge}
+                        </div>
+                        <h3 class="report-card-title">${r.title}</h3>
+                        <p class="report-card-summary">${r.summary || 'Authoritative implementation and verification report.'}</p>
+                        <div class="report-card-footer">
+                            <span>📄 ${sizeKb} KB</span>
+                            <span class="btn-read">Read Full Report →</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openReportByTask(taskId) {
+            const report = allReports.find(r => r.taskId === taskId);
+            if (report) openReport(report);
+        }
+
+        async function openReport(report) {
+            currentReportIndex = allReports.findIndex(r => r.taskId === report.taskId);
+
+            // Update URL query parameter
+            const newUrl = `${window.location.pathname}?task=${report.taskId.replace('Task-', '')}`;
+            window.history.pushState({ taskId: report.taskId }, '', newUrl);
+
+            // Switch views
+            document.getElementById('catalogSection').style.display = 'none';
+            document.getElementById('readerSection').classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Setup toolbar buttons
+            document.getElementById('btnRawMarkdown').href = report.filename;
+            
+            // Setup Screenshot link & Evidence Banner
+            const evidenceBanner = document.getElementById('evidenceBanner');
+            const btnViewScreenshots = document.getElementById('btnViewScreenshots');
+            
+            if (report.hasScreenshots && report.screenshots.length > 0) {
+                const galleryAnchor = `../review-gallery/index.html#${report.taskId.replace('.', '_')}`;
+                btnViewScreenshots.style.display = 'inline-flex';
+                btnViewScreenshots.href = galleryAnchor;
+                document.getElementById('bannerGalleryLink').href = galleryAnchor;
+
+                document.getElementById('evidenceBannerGrid').innerHTML = report.screenshots.map(s => `
+                    <div class="evidence-banner-thumb" onclick="openLightbox('${s.relativePath}', '${report.taskId} - ${s.description}', '${s.mode}', '${s.category}')">
+                        <img src="${s.relativePath}" alt="${s.description}" loading="lazy" />
+                        <div class="evidence-banner-meta">
+                            <span>${s.category.toUpperCase()} (${s.mode})</span>
+                            <span style="color: var(--accent-cyan);">🔍 View</span>
+                        </div>
+                    </div>
+                `).join('');
+                evidenceBanner.style.display = 'block';
+            } else {
+                btnViewScreenshots.style.display = 'none';
+                evidenceBanner.style.display = 'none';
+            }
+
+            // Update adjacent task navigation buttons
+            updateAdjacentNav();
+
+            // Load and render markdown content
+            const articleEl = document.getElementById('markdownContent');
+            articleEl.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 40px 0;">Loading report content...</p>';
+
+            try {
+                let mdText = '';
+                try {
+                    const resp = await fetch(report.filename);
+                    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                    mdText = await resp.text();
+                } catch (localErr) {
+                    console.warn('Local file fetch failed, trying public raw URL:', localErr);
+                    const rawResp = await fetch(report.rawUrl);
+                    if (!rawResp.ok) throw new Error(`Raw HTTP ${rawResp.status}`);
+                    mdText = await rawResp.text();
+                }
+
+                // Clean Unicode replacement chars if present
+                mdText = mdText.replace(/\ufffd/g, '—');
+
+                // Render with marked.js
+                if (typeof marked !== 'undefined') {
+                    articleEl.innerHTML = marked.parse(mdText);
+                } else {
+                    articleEl.innerHTML = fallbackMarkdownParse(mdText);
+                }
+
+            } catch (err) {
+                console.error('Failed to render report:', err);
+                articleEl.innerHTML = `
+                    <h2>Report Loading Notice</h2>
+                    <p>Could not dynamically load <code>${report.filename}</code> via browser fetch (${err.message}).</p>
+                    <p><a href="${report.filename}" target="_blank" class="btn-toolbar btn-primary">Open Raw Markdown File Directly</a></p>
+                `;
+            }
+        }
+
+        function backToCatalog() {
+            window.history.pushState({}, '', window.location.pathname);
+            document.getElementById('readerSection').classList.remove('active');
+            document.getElementById('catalogSection').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateAdjacentNav() {
+            const prevBtn = document.getElementById('btnPrevTask');
+            const nextBtn = document.getElementById('btnNextTask');
+
+            // Reports are sorted descending (index 0 is highest task number)
+            if (currentReportIndex < allReports.length - 1) {
+                const prevTask = allReports[currentReportIndex + 1];
+                prevBtn.style.display = 'inline-flex';
+                prevBtn.innerText = `← ${prevTask.taskId}`;
+            } else {
+                prevBtn.style.display = 'none';
+            }
+
+            if (currentReportIndex > 0) {
+                const nextTask = allReports[currentReportIndex - 1];
+                nextBtn.style.display = 'inline-flex';
+                nextBtn.innerText = `${nextTask.taskId} →`;
+            } else {
+                nextBtn.style.display = 'none';
+            }
+        }
+
+        function navigateAdjacentTask(delta) {
+            // delta -1 means previous task number (index + 1 in descending list)
+            // delta +1 means next task number (index - 1 in descending list)
+            const newIndex = currentReportIndex - delta;
+            if (newIndex >= 0 && newIndex < allReports.length) {
+                openReport(allReports[newIndex]);
+            }
+        }
+
+        function copyReportLink() {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                alert('Report link copied to clipboard!');
+            }).catch(() => {
+                prompt('Copy this link:', window.location.href);
+            });
+        }
+
+        function openLightbox(src, caption, mode, cat) {
+            document.getElementById('lightboxImg').src = src;
+            document.getElementById('lightboxCaption').innerHTML = `<strong>${caption}</strong> <span style="color:var(--accent-cyan);">[${cat.toUpperCase()} - ${mode.toUpperCase()}]</span>`;
+            document.getElementById('lightboxModal').classList.add('active');
+        }
+
+        function closeLightbox(e) {
+            if (!e || e.target.id === 'lightboxModal' || e.target.classList.contains('lightbox-close')) {
+                document.getElementById('lightboxModal').classList.remove('active');
+            }
+        }
+
+        // Lightweight markdown parser fallback if marked.min.js is blocked
+        function fallbackMarkdownParse(text) {
+            let html = text
+                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                .replace(/^#### (.*$)/gim, '<h4>$1</h4>')
+                .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+                .replace(/`([^`]+)`/gim, '<code>$1</code>')
+                .replace(/^\> (.*$)/gim, '<blockquote>$1</blockquote>')
+                .replace(/\n\n/gim, '</p><p>');
+            return `<p>${html}</p>`;
+        }
+
+        // Handle Browser Forward/Back Buttons
+        window.addEventListener('popstate', (e) => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetTask = urlParams.get('task');
+            if (targetTask) {
+                const match = allReports.find(r => r.taskId.toLowerCase() === `task-${targetTask}`.toLowerCase() || r.taskId.toLowerCase() === targetTask.toLowerCase());
+                if (match) {
+                    openReport(match);
+                    return;
+                }
+            }
+            backToCatalog();
+        });
+
+        // Start
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
