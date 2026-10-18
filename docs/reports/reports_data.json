@@ -1,5 +1,28 @@
 [
   {
+    "taskId": "Task-1.59",
+    "taskMajor": 1,
+    "taskMinor": 59,
+    "filename": "task_1_59_pet_inventory_ui_audit_report.md",
+    "title": "Task 1.59 \u2014 Pet Inventory & Egg Hatch UI Audit + Targeted Polish Report",
+    "category": "Tooling & Documentation",
+    "sizeBytes": 11484,
+    "summary": "Following the successful visual foundation established in Tasks 1.51\u20131.55 (responsive HUD redesign, equipment shop overhaul, and Free Icon Pack v1.0 asset integration), this audit examined the presentation layers of *...",
+    "hasScreenshots": true,
+    "screenshotCount": 1,
+    "screenshots": [
+      {
+        "filename": "Task-1.59_ui_20261018_165516.jpg",
+        "category": "UI",
+        "mode": "Play Mode",
+        "description": "User interface view: Pet Inventory UI Audit & Targeted Polish",
+        "relativePath": "../review-gallery/screenshots/Task-1.59/Task-1.59_ui_20261018_165516.jpg",
+        "publicUrl": "https://wxstescripts.github.io/Roblox-Studio-AI/review-gallery/screenshots/Task-1.59/Task-1.59_ui_20261018_165516.jpg"
+      }
+    ],
+    "rawUrl": "https://raw.githubusercontent.com/wxstescripts/Roblox-Studio-AI/main/docs/reports/task_1_59_pet_inventory_ui_audit_report.md"
+  },
+  {
     "taskId": "Task-1.57",
     "taskMajor": 1,
     "taskMinor": 57,
