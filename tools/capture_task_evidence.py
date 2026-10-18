@@ -25,26 +25,29 @@ INDEX_HTML = os.path.join(GALLERY_DIR, "index.html")
 
 def get_git_remote_info():
     """Detects git remote origin if configured and computes GitHub Pages base URL."""
+    url = None
     try:
         res = subprocess.run(["git", "remote", "get-url", "origin"], capture_output=True, text=True)
         if res.returncode == 0 and res.stdout.strip():
             url = res.stdout.strip()
-            # Match https or ssh
-            # https://github.com/owner/repo.git or git@github.com:owner/repo.git
-            m = re.search(r"github\.com[:/]([^/]+)/([^/\.]+)", url)
-            if m:
-                owner, repo = m.group(1), m.group(2)
-                pages_url = f"https://{owner}.github.io/{repo}/docs/review-gallery"
-                raw_url = f"https://raw.githubusercontent.com/{owner}/{repo}/main/docs/review-gallery"
-                return {
-                    "has_remote": True,
-                    "owner": owner,
-                    "repo": repo,
-                    "pages_url": pages_url,
-                    "raw_url": raw_url,
-                }
     except Exception:
         pass
+
+    if not url:
+        url = "https://github.com/wxstescripts/Roblox-Studio-AI"
+
+    m = re.search(r"github\.com[:/]([^/]+)/([^/\.]+)", url)
+    if m:
+        owner, repo = m.group(1), m.group(2)
+        pages_url = f"https://{owner}.github.io/{repo}/review-gallery"
+        raw_url = f"https://raw.githubusercontent.com/{owner}/{repo}/main/docs/review-gallery"
+        return {
+            "has_remote": True,
+            "owner": owner,
+            "repo": repo,
+            "pages_url": pages_url,
+            "raw_url": raw_url,
+        }
     return {"has_remote": False, "pages_url": None, "raw_url": None}
 
 
