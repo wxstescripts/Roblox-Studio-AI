@@ -1,0 +1,11 @@
+{
+  "task-evidence-gallery": {
+    "enabled": true,
+    "Stop": [
+      {
+        "type": "command",
+        "command": "python tools/capture_task_evidence.py --rebuild-only"
+      }
+    ]
+  }
+}
