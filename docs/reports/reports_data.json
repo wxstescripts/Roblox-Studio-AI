@@ -1,5 +1,76 @@
 [
   {
+    "taskId": "Task-1.61",
+    "taskMajor": 1,
+    "taskMinor": 61,
+    "filename": "task_1_61_profit_forge_hub_rebuild_report.md",
+    "title": "Task 1.61 \u2014 Profit Forge Hub Full Rebuild Report (Approved Design A)",
+    "category": "World & Architectural Rebuild",
+    "sizeBytes": 17050,
+    "summary": "Pursuant to the user's explicit authorization of **Design Option A** from Task 1.60:",
+    "hasScreenshots": true,
+    "screenshotCount": 7,
+    "screenshots": [
+      {
+        "filename": "Task-1.61_hub_overview_clean_20261018.jpg",
+        "category": "World",
+        "mode": "Edit Mode",
+        "description": "Complete architectural overview of the new Profit Forge Hub with Spawn Pavilion, East Forge, West Bio-Aura center, and arterial roads",
+        "relativePath": "../review-gallery/screenshots/Task-1.61/Task-1.61_hub_overview_clean_20261018.jpg",
+        "publicUrl": "https://raw.githubusercontent.com/wxstescripts/Roblox-Studio-AI/main/docs/review-gallery/screenshots/Task-1.61/Task-1.61_hub_overview_clean_20261018.jpg"
+      },
+      {
+        "filename": "Task-1.61_play_hub_north_sightline_20261018.jpg",
+        "category": "World",
+        "mode": "Play Mode",
+        "description": "Play mode spawn perspective looking North towards Quarry Gatehouse with companion Rusty Pup, active HUD, and open quarry basin",
+        "relativePath": "../review-gallery/screenshots/Task-1.61/Task-1.61_play_hub_north_sightline_20261018.jpg",
+        "publicUrl": "https://raw.githubusercontent.com/wxstescripts/Roblox-Studio-AI/main/docs/review-gallery/screenshots/Task-1.61/Task-1.61_play_hub_north_sightline_20261018.jpg"
+      },
+      {
+        "filename": "Task-1.61_play_equipment_forge_20261018.jpg",
+        "category": "World",
+        "mode": "Play Mode",
+        "description": "Play mode view inside the East Equipment Foundry with anvil, glowing furnace, [E] UPGRADE prompt, and ore nodes beyond",
+        "relativePath": "../review-gallery/screenshots/Task-1.61/Task-1.61_play_equipment_forge_20261018.jpg",
+        "publicUrl": "https://raw.githubusercontent.com/wxstescripts/Roblox-Studio-AI/main/docs/review-gallery/screenshots/Task-1.61/Task-1.61_play_equipment_forge_20261018.jpg"
+      },
+      {
+        "filename": "Task-1.61_play_bioaura_incubation_20261018.jpg",
+        "category": "World",
+        "mode": "Play Mode",
+        "description": "Play mode view inside the West Bio-Aura Incubation Center with glowing stasis tanks, cryogenic manifolds, and egg console",
+        "relativePath": "../review-gallery/screenshots/Task-1.61/Task-1.61_play_bioaura_incubation_20261018.jpg",
+        "publicUrl": "https://raw.githubusercontent.com/wxstescripts/Roblox-Studio-AI/main/docs/review-gallery/screenshots/Task-1.61/Task-1.61_play_bioaura_incubation_20261018.jpg"
+      },
+      {
+        "filename": "Task-1.61_south_derrick_vista_20261018.jpg",
+        "category": "World",
+        "mode": "Edit Mode",
+        "description": "South Boulevard vista stretching toward the 55-stud Headframe Derrick Tower and scenic overlook deck",
+        "relativePath": "../review-gallery/screenshots/Task-1.61/Task-1.61_south_derrick_vista_20261018.jpg",
+        "publicUrl": "https://raw.githubusercontent.com/wxstescripts/Roblox-Studio-AI/main/docs/review-gallery/screenshots/Task-1.61/Task-1.61_south_derrick_vista_20261018.jpg"
+      },
+      {
+        "filename": "Task-1.61_spawn_north_gate_20261018.jpg",
+        "category": "World",
+        "mode": "Edit Mode",
+        "description": "Low-angle perspective through the Quarry Gatehouse archway framing the quarry entrance and mineral displays",
+        "relativePath": "../review-gallery/screenshots/Task-1.61/Task-1.61_spawn_north_gate_20261018.jpg",
+        "publicUrl": "https://raw.githubusercontent.com/wxstescripts/Roblox-Studio-AI/main/docs/review-gallery/screenshots/Task-1.61/Task-1.61_spawn_north_gate_20261018.jpg"
+      },
+      {
+        "filename": "Task-1.61_baseline_hub_20261018.jpg",
+        "category": "World",
+        "mode": "Edit Mode",
+        "description": "Preflight baseline overview of the legacy hub before Task 1.61 reconstruction",
+        "relativePath": "../review-gallery/screenshots/Task-1.61/Task-1.61_baseline_hub_20261018.jpg",
+        "publicUrl": "https://raw.githubusercontent.com/wxstescripts/Roblox-Studio-AI/main/docs/review-gallery/screenshots/Task-1.61/Task-1.61_baseline_hub_20261018.jpg"
+      }
+    ],
+    "rawUrl": "https://raw.githubusercontent.com/wxstescripts/Roblox-Studio-AI/main/docs/reports/task_1_61_profit_forge_hub_rebuild_report.md"
+  },
+  {
     "taskId": "Task-1.60",
     "taskMajor": 1,
     "taskMinor": 60,

@@ -33,6 +33,8 @@ def categorize_task(num):
         return "UI Polish & Tooling"
     elif num == 60:
         return "Architecture Design & Planning"
+    elif num == 61:
+        return "World & Architectural Rebuild"
     else:
         return "Tooling & Documentation"
 

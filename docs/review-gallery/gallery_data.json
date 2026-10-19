@@ -1,5 +1,84 @@
 [
   {
+    "taskId": "Task-1.61",
+    "title": "Profit Forge Hub Full Rebuild (Approved Design A)",
+    "timestamp": "2026-10-18 19:35:00",
+    "reportRef": "task_1_61_profit_forge_hub_rebuild_report.md",
+    "notes": "Full architectural reconstruction of the central hub into the Profit Forge Hub. Implemented elevated basalt Spawn Pavilion with brass/cyanite compass seal, Operations Promenade with Auric and Cyanite specimen pedestals, East Equipment Foundry, West Bio-Aura Incubation Center, monumental Quarry Gatehouse, enhanced Derrick Vista, and 6-plot arterial road network. Verified at 427 hub parts (budget <=850) and 14 active lights.",
+    "images": [
+      {
+        "filename": "Task-1.61_hub_overview_clean_20261018.jpg",
+        "category": "World",
+        "mode": "Edit Mode",
+        "description": "Complete architectural overview of the new Profit Forge Hub with Spawn Pavilion, East Forge, West Bio-Aura center, and arterial roads",
+        "relativePath": "screenshots/Task-1.61/Task-1.61_hub_overview_clean_20261018.jpg",
+        "publicUrl": "https://raw.githubusercontent.com/wxstescripts/Roblox-Studio-AI/main/docs/review-gallery/screenshots/Task-1.61/Task-1.61_hub_overview_clean_20261018.jpg",
+        "status": "Published (GitHub)",
+        "sizeBytes": 344825
+      },
+      {
+        "filename": "Task-1.61_play_hub_north_sightline_20261018.jpg",
+        "category": "World",
+        "mode": "Play Mode",
+        "description": "Play mode spawn perspective looking North towards Quarry Gatehouse with companion Rusty Pup, active HUD, and open quarry basin",
+        "relativePath": "screenshots/Task-1.61/Task-1.61_play_hub_north_sightline_20261018.jpg",
+        "publicUrl": "https://raw.githubusercontent.com/wxstescripts/Roblox-Studio-AI/main/docs/review-gallery/screenshots/Task-1.61/Task-1.61_play_hub_north_sightline_20261018.jpg",
+        "status": "Published (GitHub)",
+        "sizeBytes": 281428
+      },
+      {
+        "filename": "Task-1.61_play_equipment_forge_20261018.jpg",
+        "category": "World",
+        "mode": "Play Mode",
+        "description": "Play mode view inside the East Equipment Foundry with anvil, glowing furnace, [E] UPGRADE prompt, and ore nodes beyond",
+        "relativePath": "screenshots/Task-1.61/Task-1.61_play_equipment_forge_20261018.jpg",
+        "publicUrl": "https://raw.githubusercontent.com/wxstescripts/Roblox-Studio-AI/main/docs/review-gallery/screenshots/Task-1.61/Task-1.61_play_equipment_forge_20261018.jpg",
+        "status": "Published (GitHub)",
+        "sizeBytes": 283602
+      },
+      {
+        "filename": "Task-1.61_play_bioaura_incubation_20261018.jpg",
+        "category": "World",
+        "mode": "Play Mode",
+        "description": "Play mode view inside the West Bio-Aura Incubation Center with glowing stasis tanks, cryogenic manifolds, and egg console",
+        "relativePath": "screenshots/Task-1.61/Task-1.61_play_bioaura_incubation_20261018.jpg",
+        "publicUrl": "https://raw.githubusercontent.com/wxstescripts/Roblox-Studio-AI/main/docs/review-gallery/screenshots/Task-1.61/Task-1.61_play_bioaura_incubation_20261018.jpg",
+        "status": "Published (GitHub)",
+        "sizeBytes": 287070
+      },
+      {
+        "filename": "Task-1.61_south_derrick_vista_20261018.jpg",
+        "category": "World",
+        "mode": "Edit Mode",
+        "description": "South Boulevard vista stretching toward the 55-stud Headframe Derrick Tower and scenic overlook deck",
+        "relativePath": "screenshots/Task-1.61/Task-1.61_south_derrick_vista_20261018.jpg",
+        "publicUrl": "https://raw.githubusercontent.com/wxstescripts/Roblox-Studio-AI/main/docs/review-gallery/screenshots/Task-1.61/Task-1.61_south_derrick_vista_20261018.jpg",
+        "status": "Published (GitHub)",
+        "sizeBytes": 257559
+      },
+      {
+        "filename": "Task-1.61_spawn_north_gate_20261018.jpg",
+        "category": "World",
+        "mode": "Edit Mode",
+        "description": "Low-angle perspective through the Quarry Gatehouse archway framing the quarry entrance and mineral displays",
+        "relativePath": "screenshots/Task-1.61/Task-1.61_spawn_north_gate_20261018.jpg",
+        "publicUrl": "https://raw.githubusercontent.com/wxstescripts/Roblox-Studio-AI/main/docs/review-gallery/screenshots/Task-1.61/Task-1.61_spawn_north_gate_20261018.jpg",
+        "status": "Published (GitHub)",
+        "sizeBytes": 201047
+      },
+      {
+        "filename": "Task-1.61_baseline_hub_20261018.jpg",
+        "category": "World",
+        "mode": "Edit Mode",
+        "description": "Preflight baseline overview of the legacy hub before Task 1.61 reconstruction",
+        "relativePath": "screenshots/Task-1.61/Task-1.61_baseline_hub_20261018.jpg",
+        "publicUrl": "https://raw.githubusercontent.com/wxstescripts/Roblox-Studio-AI/main/docs/review-gallery/screenshots/Task-1.61/Task-1.61_baseline_hub_20261018.jpg",
+        "status": "Published (GitHub)",
+        "sizeBytes": 363634
+      }
+    ]
+  },
+  {
     "taskId": "Task-1.56",
     "title": "Automated Screenshot & Public Review Gallery",
     "timestamp": "2026-10-18 15:47:10",
