@@ -3,3 +3,12 @@
 __pycache__/
 .DS_Store
 Thumbs.db
+
+# Private Queue and Bridge Secrets (Task 1.63)
+.queue/
+.env
+.env.*
+bridge_config.json
+bridge/bridge_config.json
+*.secret
+

@@ -1,0 +1,33 @@
+{
+  "server": {
+    "host": "127.0.0.1",
+    "port": 8765,
+    "cors_origins": [
+      "https://wxstescripts.github.io",
+      "http://localhost:8765",
+      "http://127.0.0.1:8765"
+    ]
+  },
+  "auth": {
+    "auth_key": "REPLACE_WITH_YOUR_SECURE_AUTH_PASSPHRASE_OR_TOKEN"
+  },
+  "bridge": {
+    "auto_claim": false,
+    "copy_to_clipboard": true,
+    "notify_on_claim": true,
+    "queue_dir": ".queue",
+    "staged_prompt_file": ".queue/staged_prompt.md",
+    "log_file": ".queue/audit.log"
+  },
+  "safety": {
+    "max_prompt_length": 25000,
+    "default_mode": "plan-first",
+    "require_approval_for_execute": true,
+    "disallowed_execution_patterns": [
+      "rm -rf /",
+      "del /f /s /q c:\\",
+      "Format-Volume",
+      "format c:"
+    ]
+  }
+}

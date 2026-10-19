@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Mining Empire — Antigravity Prompt Control Center</title>
+    <style>
+        :root {
+            --bg-dark: #0A0D13;
+            --bg-panel: #11151F;
+            --bg-card: #161C27;
+            --bg-elevated: #1F2735;
+            --stroke-color: #263042;
+            --stroke-glow: rgba(0, 220, 255, 0.3);
+            --accent-cyan: #00DCFF;
+            --accent-gold: #FFCC00;
+            --accent-green: #00E676;
+            --accent-red: #FF3D71;
+            --accent-orange: #FF9100;
+            --text-primary: #FFFFFF;
+            --text-secondary: #90A0B5;
+            --text-muted: #5E6E82;
+            --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: var(--font-stack);
+            line-height: 1.5;
+            padding: 16px 16px 60px 16px;
+        }
+
+        .container {
+            max-width: 1380px;
+            margin: 0 auto;
+        }
+
+        /* Top Brand Header */
+        header.control-header {
+            background: linear-gradient(180deg, var(--bg-panel) 0%, rgba(17, 21, 31, 0.8) 100%);
+            border: 1px solid var(--stroke-color);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .brand-section {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-logo {
+            font-size: 28px;
+            background: rgba(0, 220, 255, 0.1);
+            border: 1px solid rgba(0, 220, 255, 0.3);
+            border-radius: 10px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-title {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+
+        .brand-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Nav Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            background: var(--bg-dark);
+            border: 1px solid var(--stroke-color);
+            border-radius: 8px;
+            padding: 4px;
+        }
+
+        .nav-tab {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 14px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-primary);
+            background: var(--bg-elevated);
+        }
+
+        .nav-tab.active {
+            color: var(--bg-dark);
+            background: var(--accent-cyan);
+            font-weight: 700;
+        }
+
+        /* Connection Bar */
+        .conn-bar {
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(38, 48, 66, 0.6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 13px;
+        }
+
+        .conn-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent-red);
+            box-shadow: 0 0 8px rgba(255, 61, 113, 0.6);
+            transition: all 0.3s;
+        }
+
+        .status-dot.online {
+            background: var(--accent-green);
+            box-shadow: 0 0 8px rgba(0, 230, 118, 0.8);
+        }
+
+        .status-dot.demo {
+            background: var(--accent-gold);
+            box-shadow: 0 0 8px rgba(255, 204, 0, 0.8);
+        }
+
+        .conn-inputs {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .conn-input {
+            background: var(--bg-dark);
+            border: 1px solid var(--stroke-color);
+            color: var(--text-primary);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: var(--font-mono);
+            outline: none;
+            width: 190px;
+        }
+
+        .conn-input:focus {
+            border-color: var(--accent-cyan);
+        }
+
+        .btn {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            border: 1px solid var(--stroke-color);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            border-color: var(--accent-cyan);
+            background: var(--bg-card);
+        }
+
+        .btn-primary {
+            background: var(--accent-cyan);
+            color: #000;
+            border-color: var(--accent-cyan);
+            font-weight: 700;
+        }
+
+        .btn-primary:hover {
+            background: #25e2ff;
+            box-shadow: 0 0 12px rgba(0, 220, 255, 0.4);
+        }
+
+        .btn-success {
+            background: var(--accent-green);
+            color: #000;
+            border-color: var(--accent-green);
+            font-weight: 700;
+        }
+
+        .btn-warning {
+            background: var(--accent-gold);
+            color: #000;
+            border-color: var(--accent-gold);
+            font-weight: 700;
+        }
+
+        .btn-danger {
+            background: rgba(255, 61, 113, 0.15);
+            color: var(--accent-red);
+            border-color: var(--accent-red);
+        }
+
+        .btn-danger:hover {
+            background: var(--accent-red);
+            color: #fff;
+        }
+
+        /* Main Workspace Grid */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 980px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--stroke-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--stroke-color);
+            padding-bottom: 12px;
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent-cyan);
+        }
+
+        /* Form Controls */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .prompt-textarea {
+            background: var(--bg-dark);
+            border: 1px solid var(--stroke-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            line-height: 1.5;
+            padding: 12px;
+            min-height: 190px;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .prompt-textarea:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(0, 220, 255, 0.2);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .mode-selector {
+            display: flex;
+            background: var(--bg-dark);
+            border: 1px solid var(--stroke-color);
+            border-radius: 8px;
+            padding: 4px;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .mode-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .mode-btn.active {
+            background: var(--bg-elevated);
+            color: var(--accent-cyan);
+            font-weight: 700;
+        }
+
+        .mode-btn.active.execute {
+            color: var(--accent-orange);
+        }
+
+        .helper-text {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .alert-box {
+            background: rgba(255, 145, 0, 0.1);
+            border: 1px solid rgba(255, 145, 0, 0.3);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 12px;
+            color: var(--accent-orange);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Queue List */
+        .queue-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .queue-table-wrapper {
+            max-height: 280px;
+            overflow-y: auto;
+            border: 1px solid var(--stroke-color);
+            border-radius: 8px;
+            background: var(--bg-dark);
+        }
+
+        .queue-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            text-align: left;
+        }
+
+        .queue-table th {
+            background: var(--bg-elevated);
+            color: var(--text-secondary);
+            font-weight: 600;
+            padding: 8px 12px;
+            position: sticky;
+            top: 0;
+            border-bottom: 1px solid var(--stroke-color);
+            z-index: 1;
+        }
+
+        .queue-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(38, 48, 66, 0.4);
+            color: var(--text-primary);
+        }
+
+        .queue-table tr {
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .queue-table tr:hover {
+            background: rgba(0, 220, 255, 0.05);
+        }
+
+        .queue-table tr.selected {
+            background: rgba(0, 220, 255, 0.12);
+            border-left: 3px solid var(--accent-cyan);
+        }
+
+        /* Status Pills */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .pill-pending { background: rgba(255, 204, 0, 0.15); color: var(--accent-gold); border: 1px solid rgba(255, 204, 0, 0.4); }
+        .pill-running { background: rgba(0, 220, 255, 0.15); color: var(--accent-cyan); border: 1px solid rgba(0, 220, 255, 0.4); }
+        .pill-awaiting { background: rgba(255, 145, 0, 0.2); color: var(--accent-orange); border: 1px solid rgba(255, 145, 0, 0.5); }
+        .pill-completed { background: rgba(0, 230, 118, 0.15); color: var(--accent-green); border: 1px solid rgba(0, 230, 118, 0.4); }
+        .pill-failed { background: rgba(255, 61, 113, 0.15); color: var(--accent-red); border: 1px solid rgba(255, 61, 113, 0.4); }
+        .pill-cancelled { background: rgba(94, 110, 130, 0.2); color: var(--text-muted); border: 1px solid var(--stroke-color); }
+
+        /* Task Detail Panel */
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .detail-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .detail-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .prompt-preview-box {
+            background: var(--bg-dark);
+            border: 1px solid var(--stroke-color);
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 12px;
+            font-family: var(--font-mono);
+            max-height: 130px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            color: var(--text-secondary);
+        }
+
+        .log-terminal {
+            background: #06080D;
+            border: 1px solid #1A2230;
+            border-radius: 8px;
+            padding: 12px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: #A0B2C6;
+            min-height: 160px;
+            max-height: 240px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .log-line {
+            line-height: 1.4;
+            word-break: break-all;
+        }
+
+        .log-line.info { color: var(--text-secondary); }
+        .log-line.success { color: var(--accent-green); }
+        .log-line.warn { color: var(--accent-gold); }
+        .log-line.error { color: var(--accent-red); }
+
+        .artifacts-card {
+            background: var(--bg-card);
+            border: 1px solid var(--stroke-color);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .artifact-link {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+
+        .artifact-link:hover {
+            text-decoration: underline;
+        }
+
+        .toast-msg {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--accent-cyan);
+            border-radius: 8px;
+            padding: 12px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            display: none;
+            z-index: 1000;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Top Brand Header -->
+        <header class="control-header">
+            <div class="header-top">
+                <div class="brand-section">
+                    <div class="brand-logo">⚡</div>
+                    <div>
+                        <div class="brand-title">Antigravity Web Prompt Control Center</div>
+                        <div class="brand-subtitle">Pet Mining Empire — Remote Prompt Submission & Task Queue Interface</div>
+                    </div>
+                </div>
+                <nav class="nav-tabs">
+                    <a href="../review-gallery/index.html" class="nav-tab">📷 Screenshot Gallery</a>
+                    <a href="../reports/index.html" class="nav-tab">📄 Task Reports</a>
+                    <a href="index.html" class="nav-tab active">⚡ Control Center</a>
+                </nav>
+            </div>
+
+            <!-- Bridge Connection Bar -->
+            <div class="conn-bar">
+                <div class="conn-status">
+                    <div class="status-dot" id="statusDot"></div>
+                    <span id="statusLabel" style="font-weight: 700;">Checking Bridge...</span>
+                    <span id="statusDetail" style="color: var(--text-muted); font-size: 12px;"></span>
+                </div>
+                <div class="conn-inputs">
+                    <input type="text" id="bridgeUrl" class="conn-input" value="http://127.0.0.1:8765" placeholder="Bridge API URL">
+                    <input type="password" id="authKey" class="conn-input" placeholder="Bearer Auth Key" title="Local Bridge Passphrase">
+                    <button class="btn btn-primary" id="btnConnect" onclick="connectBridge()">Connect</button>
+                    <button class="btn" id="btnToggleDemo" onclick="toggleDemoMode()">Demo Mode</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Grid -->
+        <div class="workspace-grid">
+            <!-- Left Column: Submit & Queue -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <!-- Prompt Editor Card -->
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <div class="panel-title">📝 Submit New Task Prompt</div>
+                        <div style="display: flex; gap: 8px;">
+                            <select id="templateSelect" class="conn-input" style="width: 140px; font-size: 11px;" onchange="applyTemplate()">
+                                <option value="">Prompt Template...</option>
+                                <option value="inspect">Read-Only Audit</option>
+                                <option value="bugfix">Targeted Defect Fix</option>
+                                <option value="perf">Performance Profiling</option>
+                            </select>
+                            <button class="btn" onclick="clearEditor()">Clear</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-label">
+                            <span>Task Title (Optional)</span>
+                        </div>
+                        <input type="text" id="taskTitle" class="conn-input" style="width: 100%; font-size: 13px;" placeholder="e.g. Task 1.64 — Visual Regression Audit">
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-label">
+                            <span>Multiline Prompt Instructions</span>
+                            <span id="charCount" style="font-family: var(--font-mono); color: var(--text-muted);">0 / 25000</span>
+                        </div>
+                        <textarea id="promptInput" class="prompt-textarea" placeholder="Describe the task, scope, constraints, and verification steps in full detail..." oninput="updateCharCount()"></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 2;">
+                            <div class="form-label">Execution Mode</div>
+                            <div class="mode-selector">
+                                <button type="button" class="mode-btn active" id="modePlan" onclick="setMode('plan-first')">🔍 Plan/Inspect-First (Default)</button>
+                                <button type="button" class="mode-btn" id="modeExecute" onclick="setMode('execute')">⚡ Execute Mode</button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <div class="form-label">Category</div>
+                            <select id="taskCategory" class="conn-input" style="width: 100%; height: 38px;">
+                                <option value="World & Architecture">World / Hub</option>
+                                <option value="UI & HUD">UI & HUD</option>
+                                <option value="Gameplay & Systems">Gameplay</option>
+                                <option value="Performance & Audit">Audit / QA</option>
+                                <option value="Documentation">Documentation</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="executeWarning" class="alert-box" style="display: none;">
+                        <span>⚠️ <strong>Execute Mode:</strong> Direct workspace edits require explicit user confirmation before execution begins.</span>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+                        <span class="helper-text">Tasks are securely stored in your local Windows queue.</span>
+                        <button class="btn btn-primary" id="btnSubmit" style="padding: 10px 24px; font-size: 13px;" onclick="submitTask()">🚀 Submit to Queue</button>
+                    </div>
+                </div>
+
+                <!-- Queue Monitor Card -->
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <div class="panel-title">📋 Task Queue Monitor</div>
+                        <div class="queue-controls">
+                            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                                <input type="checkbox" id="autoRefresh" checked onchange="toggleAutoRefresh()"> Auto-poll (5s)
+                            </label>
+                            <button class="btn" style="padding: 4px 8px; font-size: 11px;" onclick="fetchTasks()">🔄 Refresh</button>
+                        </div>
+                    </div>
+
+                    <div class="queue-table-wrapper">
+                        <table class="queue-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Title</th>
+                                    <th>Mode</th>
+                                    <th>Status</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="queueTbody">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">No tasks in queue. Connect bridge to load live queue.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Detail, Handoff & Logs -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <div class="panel-card" style="height: 100%;">
+                    <div class="panel-header">
+                        <div class="panel-title">🔍 Task Inspection & Handoff</div>
+                        <div id="detailStatusPill">
+                            <span class="status-pill pill-cancelled">None Selected</span>
+                        </div>
+                    </div>
+
+                    <div id="emptyDetailPrompt" style="text-align: center; color: var(--text-muted); padding: 40px 20px;">
+                        <div style="font-size: 32px; margin-bottom: 8px;">📑</div>
+                        Select a task from the Queue Monitor on the left to inspect its instructions, execution logs, and staged handoff state.
+                    </div>
+
+                    <div id="detailContent" style="display: none; flex-direction: column; gap: 16px;">
+                        <div class="detail-header">
+                            <div>
+                                <div class="detail-title" id="detailTitle">Task Title</div>
+                                <div class="detail-meta">
+                                    <span id="detailId" style="font-family: var(--font-mono); color: var(--accent-cyan); font-weight: 700;">TASK-00000</span>
+                                    <span id="detailMode">Mode: Plan-First</span>
+                                    <span id="detailTime">Submitted: Just now</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 6px;">
+                                <button class="btn" onclick="copySelectedPrompt()">📋 Copy Prompt</button>
+                                <button class="btn btn-danger" id="btnCancelTask" onclick="cancelSelectedTask()">Cancel</button>
+                            </div>
+                        </div>
+
+                        <!-- Approval Box -->
+                        <div id="approvalBanner" class="alert-box" style="display: none; justify-content: space-between;">
+                            <div>
+                                <strong>Approval Required:</strong> This task requires explicit operator confirmation before execution.
+                            </div>
+                            <button class="btn btn-warning" onclick="approveSelectedTask()">Approve Execution</button>
+                        </div>
+
+                        <!-- Prompt View -->
+                        <div class="form-group">
+                            <div class="form-label">Task Instructions</div>
+                            <div class="prompt-preview-box" id="detailPrompt"></div>
+                        </div>
+
+                        <!-- Handoff Action -->
+                        <div style="background: var(--bg-card); border: 1px solid var(--stroke-color); border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+                            <div>
+                                <div style="font-size: 13px; font-weight: 700; color: var(--accent-cyan);">Handoff to Antigravity IDE</div>
+                                <div style="font-size: 11px; color: var(--text-muted);">Stages prompt in .queue/staged_prompt.md and copies to clipboard.</div>
+                            </div>
+                            <button class="btn btn-primary" id="btnClaimTask" onclick="claimSelectedTask()">⚡ Claim & Stage</button>
+                        </div>
+
+                        <!-- Execution Terminal -->
+                        <div class="form-group">
+                            <div class="form-label">
+                                <span>Execution Logs & Audit Trail</span>
+                                <span style="font-size: 11px; color: var(--text-muted);">Live stream</span>
+                            </div>
+                            <div class="log-terminal" id="detailLogs">
+                                <div class="log-line info">[IDLE] Waiting for task execution...</div>
+                            </div>
+                        </div>
+
+                        <!-- Artifacts Card -->
+                        <div class="artifacts-card">
+                            <div style="font-weight: 700; color: var(--accent-gold); font-size: 13px;">📦 Artifacts & Deliverables</div>
+                            <div id="artifactsList" style="display: flex; flex-direction: column; gap: 6px;">
+                                <span style="color: var(--text-muted);">No published deliverables yet. Complete the task to generate reports and screenshots.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast-msg"></div>
+
+    <script>
+        // State
+        let currentMode = 'plan-first';
+        let isDemoMode = false;
+        let selectedTaskId = null;
+        let pollInterval = null;
+        let mockTasks = [];
+
+        // Templates
+        const TEMPLATES = {
+            inspect: "# Task Audit & Inspection\n\n## Objective\nPerform a comprehensive read-only audit of the target module.\n\n## Scope\n- Inspect live DataModel hierarchy and script implementations.\n- Document exact part counts, lighting properties, and memory footprint.\n- Do NOT modify any gameplay or economy scripts.",
+            bugfix: "# Targeted Defect Resolution\n\n## Objective\nResolve confirmed visual and collision defects.\n\n## Steps\n1. Inspect evidence in Roblox Studio and verify defect location.\n2. Apply localized Luau fixes to geometry or materials.\n3. Run Play-mode regression tests to confirm fix with zero side effects.",
+            perf: "# Mobile GPU & Memory Performance Profiling\n\n## Objective\nValidate collision and shadow budgets.\n\n## Requirements\n- Ensure all overhead trim parts have CanCollide = false.\n- Ensure non-essential small detail parts have CastShadow = false.\n- Confirm active light count remains within the 14-light mobile ceiling."
+        };
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUrl = localStorage.getItem('agy_bridge_url');
+            if (savedUrl) document.getElementById('bridgeUrl').value = savedUrl;
+            
+            const savedKey = sessionStorage.getItem('agy_auth_key');
+            if (savedKey) document.getElementById('authKey').value = savedKey;
+
+            connectBridge();
+            toggleAutoRefresh();
+        });
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('modePlan').classList.toggle('active', mode === 'plan-first');
+            document.getElementById('modeExecute').classList.toggle('active', mode === 'execute');
+            document.getElementById('modeExecute').classList.toggle('execute', mode === 'execute');
+            document.getElementById('executeWarning').style.display = (mode === 'execute') ? 'flex' : 'none';
+        }
+
+        function applyTemplate() {
+            const key = document.getElementById('templateSelect').value;
+            if (TEMPLATES[key]) {
+                document.getElementById('promptInput').value = TEMPLATES[key];
+                updateCharCount();
+            }
+        }
+
+        function updateCharCount() {
+            const count = document.getElementById('promptInput').value.length;
+            document.getElementById('charCount').innerText = `${count} / 25000`;
+        }
+
+        function clearEditor() {
+            document.getElementById('taskTitle').value = '';
+            document.getElementById('promptInput').value = '';
+            document.getElementById('templateSelect').value = '';
+            updateCharCount();
+        }
+
+        function getAuthHeader() {
+            const key = document.getElementById('authKey').value.trim();
+            return key ? { 'Authorization': `Bearer ${key}` } : {};
+        }
+
+        function getBridgeUrl() {
+            return document.getElementById('bridgeUrl').value.trim().replace(/\/+$/, '');
+        }
+
+        // Bridge Connection
+        async function connectBridge() {
+            const url = getBridgeUrl();
+            const key = document.getElementById('authKey').value.trim();
+            localStorage.setItem('agy_bridge_url', url);
+            if (key) sessionStorage.setItem('agy_auth_key', key);
+
+            const statusDot = document.getElementById('statusDot');
+            const statusLabel = document.getElementById('statusLabel');
+            const statusDetail = document.getElementById('statusDetail');
+
+            statusLabel.innerText = "Connecting...";
+            statusDot.className = "status-dot";
+
+            try {
+                const res = await fetch(`${url}/api/health`, { method: 'GET', mode: 'cors' });
+                if (res.ok) {
+                    const data = await res.json();
+                    isDemoMode = false;
+                    statusDot.className = "status-dot online";
+                    statusLabel.innerText = "Bridge Online";
+                    statusDetail.innerText = `(${data.service} v${data.version})`;
+                    showToast("Connected to local Antigravity Bridge");
+                    fetchTasks();
+                    return;
+                }
+            } catch (err) {
+                // Connection failed
+            }
+
+            statusDot.className = "status-dot";
+            statusLabel.innerText = "Bridge Offline";
+            statusDetail.innerText = "(Run bridge/server.py locally)";
+        }
+
+        function toggleDemoMode() {
+            isDemoMode = !isDemoMode;
+            const statusDot = document.getElementById('statusDot');
+            const statusLabel = document.getElementById('statusLabel');
+            const statusDetail = document.getElementById('statusDetail');
+
+            if (isDemoMode) {
+                statusDot.className = "status-dot demo";
+                statusLabel.innerText = "Demo / Simulation Mode";
+                statusDetail.innerText = "(In-Browser Mock)";
+                initMockTasks();
+                renderTasks(mockTasks);
+                showToast("Switched to Offline Demo Mode");
+            } else {
+                connectBridge();
+            }
+        }
+
+        function initMockTasks() {
+            if (mockTasks.length === 0) {
+                mockTasks = [
+                    {
+                        id: "TASK-01062",
+                        title: "Profit Forge Hub Visual Review & Reconciliation",
+                        prompt: "Perform a genuine visual and technical review of Task 1.61 Profit Forge Hub. Reconcile part counts, fix road seam, and verify in Play mode.",
+                        mode: "plan-first",
+                        status: "completed",
+                        require_approval: false,
+                        created_at: "2026-10-18T20:15:00Z",
+                        claimed_at: "2026-10-18T20:16:00Z",
+                        completed_at: "2026-10-18T20:23:00Z",
+                        logs: [
+                            "[2026-10-18T20:15:00Z] Task submitted to queue (Mode: plan-first)",
+                            "[2026-10-18T20:16:00Z] Task claimed by operator. Staged to .queue/staged_prompt.md",
+                            "[2026-10-18T20:18:00Z] Verified 411 Hub BaseParts across 12 child models",
+                            "[2026-10-18T20:20:00Z] Headframe Boulevard road seam extended to 108.5 studs flush with stairs",
+                            "[2026-10-18T20:23:00Z] All 24 ore nodes and 6 tycoon plots verified in Play mode"
+                        ],
+                        artifacts: {
+                            report_ref: "../reports/task_1_62_profit_forge_hub_visual_qa_report.md",
+                            commit_sha: "3597ad7",
+                            gallery_ref: "../review-gallery/index.html",
+                            screenshots: ["Task-1.62_play_hub_north_verified_20261018.jpg"]
+                        }
+                    }
+                ];
+            }
+        }
+
+        // Fetch Queue Tasks
+        async function fetchTasks() {
+            if (isDemoMode) {
+                renderTasks(mockTasks);
+                return;
+            }
+
+            const url = getBridgeUrl();
+            try {
+                const res = await fetch(`${url}/api/tasks`, {
+                    headers: { ...getAuthHeader() },
+                    mode: 'cors'
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    renderTasks(data.tasks || []);
+                } else if (res.status === 401) {
+                    document.getElementById('queueTbody').innerHTML = `
+                        <tr><td colspan="5" style="text-align: center; color: var(--accent-red); padding: 20px;">
+                            🔒 Unauthorized: Enter your Bearer Auth Key above to unlock queue.
+                        </td></tr>`;
+                }
+            } catch (err) {
+                // Handled gracefully
+            }
+        }
+
+        function renderTasks(tasks) {
+            const tbody = document.getElementById('queueTbody');
+            if (!tasks || tasks.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">No tasks currently in queue.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = tasks.map(t => {
+                const pillClass = `pill-${t.status.replace('_', '')}`;
+                const isSelected = (t.id === selectedTaskId) ? 'selected' : '';
+                const timeStr = t.created_at ? new Date(t.created_at).toLocaleTimeString() : 'N/A';
+                return `
+                    <tr class="${isSelected}" onclick="selectTask('${t.id}')">
+                        <td style="font-family: var(--font-mono); font-weight: 700; color: var(--accent-cyan);">${t.id}</td>
+                        <td style="font-weight: 600; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(t.title)}</td>
+                        <td><span style="font-size: 11px; color: ${t.mode === 'execute' ? 'var(--accent-orange)' : 'var(--text-secondary)'}; font-weight: 600;">${t.mode === 'execute' ? '⚡ Execute' : '🔍 Plan'}</span></td>
+                        <td><span class="status-pill ${pillClass}">${t.status}</span></td>
+                        <td style="color: var(--text-muted); font-size: 11px;">${timeStr}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            if (selectedTaskId) {
+                const currentTask = tasks.find(t => t.id === selectedTaskId);
+                if (currentTask) displayTaskDetail(currentTask);
+            }
+        }
+
+        // Submit New Task
+        async function submitTask() {
+            const prompt = document.getElementById('promptInput').value.trim();
+            if (!prompt) {
+                alert("Please enter prompt instructions.");
+                return;
+            }
+
+            const title = document.getElementById('taskTitle').value.trim();
+            const category = document.getElementById('taskCategory').value;
+
+            if (isDemoMode) {
+                const newId = `TASK-${String(Math.floor(Math.random() * 90000) + 10000)}`;
+                const newTask = {
+                    id: newId,
+                    title: title || prompt.split('\n')[0].substring(0, 50),
+                    prompt: prompt,
+                    mode: currentMode,
+                    category: category,
+                    status: (currentMode === 'execute') ? 'awaiting_approval' : 'pending',
+                    require_approval: (currentMode === 'execute'),
+                    created_at: new Date().toISOString(),
+                    claimed_at: null,
+                    completed_at: null,
+                    logs: [
+                        `[${new Date().toLocaleTimeString()}] Task submitted in Demo Mode (Mode: ${currentMode})`
+                    ],
+                    artifacts: {}
+                };
+                mockTasks.unshift(newTask);
+                renderTasks(mockTasks);
+                selectTask(newId);
+                clearEditor();
+                showToast(`Task ${newId} queued in Demo Mode`);
+                return;
+            }
+
+            const url = getBridgeUrl();
+            try {
+                const res = await fetch(`${url}/api/tasks/submit`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...getAuthHeader()
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        prompt: prompt,
+                        mode: currentMode,
+                        category: category
+                    })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    showToast(`Task ${data.task.id} queued successfully!`);
+                    clearEditor();
+                    fetchTasks();
+                    selectTask(data.task.id);
+                } else {
+                    const err = await res.json();
+                    alert(`Error: ${err.error || 'Failed to submit task'}`);
+                }
+            } catch (err) {
+                alert(`Network error connecting to bridge: ${err.message}`);
+            }
+        }
+
+        // Task Details & Actions
+        async function selectTask(taskId) {
+            selectedTaskId = taskId;
+            if (isDemoMode) {
+                const t = mockTasks.find(item => item.id === taskId);
+                if (t) displayTaskDetail(t);
+                renderTasks(mockTasks);
+                return;
+            }
+
+            const url = getBridgeUrl();
+            try {
+                const res = await fetch(`${url}/api/tasks/${taskId}`, {
+                    headers: { ...getAuthHeader() }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    displayTaskDetail(data.task);
+                    fetchTasks();
+                }
+            } catch (err) {}
+        }
+
+        function displayTaskDetail(task) {
+            document.getElementById('emptyDetailPrompt').style.display = 'none';
+            document.getElementById('detailContent').style.display = 'flex';
+
+            document.getElementById('detailId').innerText = task.id;
+            document.getElementById('detailTitle').innerText = task.title;
+            document.getElementById('detailMode').innerText = `Mode: ${task.mode.toUpperCase()}`;
+            document.getElementById('detailTime').innerText = `Submitted: ${new Date(task.created_at).toLocaleString()}`;
+            document.getElementById('detailPrompt').innerText = task.prompt;
+
+            // Status Pill
+            const pillClass = `pill-${task.status.replace('_', '')}`;
+            document.getElementById('detailStatusPill').innerHTML = `<span class="status-pill ${pillClass}">${task.status}</span>`;
+
+            // Approval Banner
+            const approvalBanner = document.getElementById('approvalBanner');
+            if (task.status === 'awaiting_approval') {
+                approvalBanner.style.display = 'flex';
+            } else {
+                approvalBanner.style.display = 'none';
+            }
+
+            // Logs
+            const logBox = document.getElementById('detailLogs');
+            if (task.logs && task.logs.length > 0) {
+                logBox.innerHTML = task.logs.map(line => {
+                    let cls = 'info';
+                    if (line.includes('error') || line.includes('Error')) cls = 'error';
+                    else if (line.includes('completed') || line.includes('Verified') || line.includes('staged')) cls = 'success';
+                    return `<div class="log-line ${cls}">${escapeHtml(line)}</div>`;
+                }).join('');
+            } else {
+                logBox.innerHTML = `<div class="log-line info">[IDLE] No logs recorded.</div>`;
+            }
+
+            // Artifacts
+            const artList = document.getElementById('artifactsList');
+            if (task.artifacts && (task.artifacts.report_ref || task.artifacts.commit_sha)) {
+                let html = '';
+                if (task.artifacts.report_ref) {
+                    html += `<a href="${task.artifacts.report_ref}" class="artifact-link">📄 View Task Report (${task.artifacts.report_ref.split('/').pop()})</a>`;
+                }
+                if (task.artifacts.commit_sha) {
+                    html += `<a href="https://github.com/wxstescripts/Roblox-Studio-AI/commit/${task.artifacts.commit_sha}" target="_blank" class="artifact-link">🔗 GitHub Commit (${task.artifacts.commit_sha.substring(0, 7)})</a>`;
+                }
+                if (task.artifacts.gallery_ref) {
+                    html += `<a href="${task.artifacts.gallery_ref}" class="artifact-link">📷 Review Gallery Entry</a>`;
+                }
+                artList.innerHTML = html;
+            } else {
+                artList.innerHTML = `<span style="color: var(--text-muted);">No published deliverables yet. Task is pending or in progress.</span>`;
+            }
+        }
+
+        async function claimSelectedTask() {
+            if (!selectedTaskId) return;
+
+            if (isDemoMode) {
+                const t = mockTasks.find(item => item.id === selectedTaskId);
+                if (t) {
+                    t.status = 'running';
+                    t.logs.push(`[${new Date().toLocaleTimeString()}] Task claimed & staged to clipboard (Simulation)`);
+                    navigator.clipboard.writeText(t.prompt);
+                    displayTaskDetail(t);
+                    renderTasks(mockTasks);
+                    showToast("Prompt copied to clipboard & staged!");
+                }
+                return;
+            }
+
+            const url = getBridgeUrl();
+            try {
+                const res = await fetch(`${url}/api/tasks/${selectedTaskId}/claim`, {
+                    method: 'POST',
+                    headers: { ...getAuthHeader() }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    showToast(`Task ${selectedTaskId} claimed & staged to clipboard!`);
+                    displayTaskDetail(data.task);
+                    fetchTasks();
+                } else {
+                    const err = await res.json();
+                    alert(`Error: ${err.error}`);
+                }
+            } catch (err) {
+                alert(`Network error: ${err.message}`);
+            }
+        }
+
+        async function approveSelectedTask() {
+            if (!selectedTaskId) return;
+            if (isDemoMode) {
+                const t = mockTasks.find(item => item.id === selectedTaskId);
+                if (t) {
+                    t.status = 'running';
+                    t.logs.push(`[${new Date().toLocaleTimeString()}] Execution explicitly approved by user`);
+                    displayTaskDetail(t);
+                    renderTasks(mockTasks);
+                    showToast("Task execution approved!");
+                }
+                return;
+            }
+
+            const url = getBridgeUrl();
+            try {
+                const res = await fetch(`${url}/api/tasks/${selectedTaskId}/approve`, {
+                    method: 'POST',
+                    headers: { ...getAuthHeader() }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    showToast("Task approved for execution!");
+                    displayTaskDetail(data.task);
+                    fetchTasks();
+                }
+            } catch (err) {
+                alert(`Network error: ${err.message}`);
+            }
+        }
+
+        async function cancelSelectedTask() {
+            if (!selectedTaskId) return;
+            if (isDemoMode) {
+                const t = mockTasks.find(item => item.id === selectedTaskId);
+                if (t) {
+                    t.status = 'cancelled';
+                    t.logs.push(`[${new Date().toLocaleTimeString()}] Task cancelled by operator`);
+                    displayTaskDetail(t);
+                    renderTasks(mockTasks);
+                    showToast("Task cancelled");
+                }
+                return;
+            }
+
+            const url = getBridgeUrl();
+            try {
+                const res = await fetch(`${url}/api/tasks/${selectedTaskId}/cancel`, {
+                    method: 'POST',
+                    headers: { ...getAuthHeader() }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    showToast("Task cancelled");
+                    displayTaskDetail(data.task);
+                    fetchTasks();
+                }
+            } catch (err) {
+                alert(`Network error: ${err.message}`);
+            }
+        }
+
+        function copySelectedPrompt() {
+            const text = document.getElementById('detailPrompt').innerText;
+            if (text) {
+                navigator.clipboard.writeText(text);
+                showToast("Prompt copied to clipboard!");
+            }
+        }
+
+        function toggleAutoRefresh() {
+            const checked = document.getElementById('autoRefresh').checked;
+            if (checked && !pollInterval) {
+                pollInterval = setInterval(fetchTasks, 5000);
+            } else if (!checked && pollInterval) {
+                clearInterval(pollInterval);
+                pollInterval = null;
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+    </script>
+</body>
+</html>
