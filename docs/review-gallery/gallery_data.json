@@ -1,5 +1,64 @@
 [
   {
+    "taskId": "Task-1.62",
+    "title": "Profit Forge Hub Visual Review, Count Reconciliation & Targeted Fixes",
+    "timestamp": "2026-10-18 20:15:00",
+    "reportRef": "task_1_62_profit_forge_hub_visual_qa_report.md",
+    "notes": "Full visual QA and technical audit of Profit Forge Hub. Reconciled part counts (exact 411 Hub BaseParts across 12 child models/folders, within 850 budget), audited lighting (14/14 active lights), collision (52.1% non-colliding), and shadows (66.9% no-shadow). Resolved road intersection seam by extending Headframe Boulevard to 108.5 studs flush with South Grand Stairs. Upgraded Quarry Gatehouse scale borders to diamond-plate industrial curbs. Verified all interactive prompts, 6 plot feeder roads, and 24 active ore nodes in live Play mode.",
+    "images": [
+      {
+        "filename": "Task-1.62_play_hub_north_verified_20261018.jpg",
+        "category": "World",
+        "mode": "Play Mode",
+        "description": "Play mode spawn perspective looking North towards Quarry Gatehouse with companion Rusty Pup, active HUD, and open quarry basin",
+        "relativePath": "screenshots/Task-1.62/Task-1.62_play_hub_north_verified_20261018.jpg",
+        "publicUrl": "https://raw.githubusercontent.com/wxstescripts/Roblox-Studio-AI/main/docs/review-gallery/screenshots/Task-1.62/Task-1.62_play_hub_north_verified_20261018.jpg",
+        "status": "Published (GitHub)",
+        "sizeBytes": 240882
+      },
+      {
+        "filename": "Task-1.62_play_south_boulevard_seam_fixed_20261018.jpg",
+        "category": "World",
+        "mode": "Play Mode",
+        "description": "Play mode view walking south along Headframe Boulevard toward the 55-stud Derrick Tower with seamless unbroken pavement and double white center stripes",
+        "relativePath": "screenshots/Task-1.62/Task-1.62_play_south_boulevard_seam_fixed_20261018.jpg",
+        "publicUrl": "https://raw.githubusercontent.com/wxstescripts/Roblox-Studio-AI/main/docs/review-gallery/screenshots/Task-1.62/Task-1.62_play_south_boulevard_seam_fixed_20261018.jpg",
+        "status": "Published (GitHub)",
+        "sizeBytes": 248984
+      },
+      {
+        "filename": "Task-1.62_play_equipment_forge_verified_20261018.jpg",
+        "category": "World",
+        "mode": "Play Mode",
+        "description": "Play mode view inside the East Equipment Forge with workbench, anvil, molten smelting hearth, and active [E] UPGRADE prompt",
+        "relativePath": "screenshots/Task-1.62/Task-1.62_play_equipment_forge_verified_20261018.jpg",
+        "publicUrl": "https://raw.githubusercontent.com/wxstescripts/Roblox-Studio-AI/main/docs/review-gallery/screenshots/Task-1.62/Task-1.62_play_equipment_forge_verified_20261018.jpg",
+        "status": "Published (GitHub)",
+        "sizeBytes": 261227
+      },
+      {
+        "filename": "Task-1.62_gatehouse_hazard_border_closeup_20261018.jpg",
+        "category": "World",
+        "mode": "Edit Mode",
+        "description": "Close-up inspection of Quarry Gatehouse weighbridge scale showing diamond-plate industrial hazard curbs and concrete blast abutments",
+        "relativePath": "screenshots/Task-1.62/Task-1.62_gatehouse_hazard_border_closeup_20261018.jpg",
+        "publicUrl": "https://raw.githubusercontent.com/wxstescripts/Roblox-Studio-AI/main/docs/review-gallery/screenshots/Task-1.62/Task-1.62_gatehouse_hazard_border_closeup_20261018.jpg",
+        "status": "Published (GitHub)",
+        "sizeBytes": 242740
+      },
+      {
+        "filename": "Task-1.62_hub_overview_verified_20261018.jpg",
+        "category": "World",
+        "mode": "Edit Mode",
+        "description": "Overhead architectural overview of Profit Forge Hub showing all 7 zones, 6 radial feeder roads, and seamless arterial boulevard",
+        "relativePath": "screenshots/Task-1.62/Task-1.62_hub_overview_verified_20261018.jpg",
+        "publicUrl": "https://raw.githubusercontent.com/wxstescripts/Roblox-Studio-AI/main/docs/review-gallery/screenshots/Task-1.62/Task-1.62_hub_overview_verified_20261018.jpg",
+        "status": "Published (GitHub)",
+        "sizeBytes": 348022
+      }
+    ]
+  },
+  {
     "taskId": "Task-1.61",
     "title": "Profit Forge Hub Full Rebuild (Approved Design A)",
     "timestamp": "2026-10-18 19:35:00",
