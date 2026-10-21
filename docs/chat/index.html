@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DevHub Realtime Chat — Team Collaboration</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#151d2f',
+                            900: '#0f172a',
+                            950: '#080d1a',
+                        },
+                        indigo: {
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Fira Code', 'Menlo', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        
+        /* Auto-resizing textarea animation */
+        textarea {
+            field-sizing: content;
+            max-height: 160px;
+        }
+
+        /* Pulse badge */
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+        }
+        .pulse-online { animation: pulse-dot 2s infinite ease-in-out; }
+    </style>
+</head>
+<body class="h-full flex flex-col bg-slate-950 text-slate-100 font-sans antialiased overflow-hidden select-none">
+
+    <!-- Top App Navigation Bar -->
+    <header class="h-16 border-b border-slate-800/80 bg-slate-900/90 backdrop-blur-md px-4 flex items-center justify-between z-30 shrink-0">
+        <div class="flex items-center gap-3">
+            <!-- Mobile Room Toggle -->
+            <button id="btnMobileRoomToggle" class="md:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+
+            <!-- Brand Logo & Current Room -->
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-cyan-500 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/20">
+                    ⚡
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-indigo-400">DevHub Chat</span>
+                        <span id="connectionBadge" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                            <span id="connectionText">Connecting...</span>
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1.5 text-sm font-bold text-slate-200">
+                        <span class="text-slate-500">#</span>
+                        <span id="activeRoomName">general</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Header Actions -->
+        <div class="flex items-center gap-2">
+            <!-- Share Link Button -->
+            <button id="btnShareLink" title="Copy shareable link to this room" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/60 transition shadow-sm active:scale-95">
+                <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
+                </svg>
+                <span class="hidden sm:inline">Share Room</span>
+            </button>
+
+            <!-- Sound Mute/Unmute Toggle -->
+            <button id="btnSoundToggle" title="Toggle audio chime notifications" class="p-2 rounded-lg text-slate-400 hover:text-slate-200 bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 transition active:scale-95">
+                <span id="soundIcon">🔔</span>
+            </button>
+
+            <!-- User Profile Button -->
+            <button id="btnProfileModal" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 transition">
+                <div id="userAvatarSmall" class="w-6 h-6 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-[10px] font-bold text-white uppercase">
+                    ?
+                </div>
+                <span id="userNameLabel" class="text-xs font-semibold text-slate-300 max-w-[100px] truncate hidden md:inline">Loading...</span>
+            </button>
+
+            <!-- Firebase Settings Config Button -->
+            <button id="btnConfigModal" title="Firebase Settings" class="p-2 rounded-lg text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 transition active:scale-95">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace Layout -->
+    <div class="flex-1 flex overflow-hidden relative">
+
+        <!-- Sidebar / Channels Drawer -->
+        <aside id="roomSidebar" class="w-64 border-r border-slate-800/80 bg-slate-900/60 backdrop-blur-sm flex flex-col shrink-0 absolute md:static inset-y-0 left-0 z-20 -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+            <div class="p-3 border-b border-slate-800 flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Rooms & Channels</span>
+                <button id="btnNewRoom" title="Create / Join custom room" class="p-1.5 text-slate-400 hover:text-white rounded hover:bg-slate-800 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                </button>
+            </div>
+
+            <!-- Room List -->
+            <div class="flex-1 overflow-y-auto p-2 space-y-1" id="roomListContainer">
+                <button onclick="switchRoom('general')" class="room-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition text-left text-slate-300 hover:bg-slate-800/60" data-room="general">
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-500 font-bold">#</span>
+                        <span>general</span>
+                    </div>
+                </button>
+                <button onclick="switchRoom('roblox-dev')" class="room-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition text-left text-slate-300 hover:bg-slate-800/60" data-room="roblox-dev">
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-500 font-bold">#</span>
+                        <span>roblox-dev</span>
+                    </div>
+                </button>
+                <button onclick="switchRoom('ui-design')" class="room-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition text-left text-slate-300 hover:bg-slate-800/60" data-room="ui-design">
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-500 font-bold">#</span>
+                        <span>ui-design</span>
+                    </div>
+                </button>
+                <button onclick="switchRoom('ai-orchestration')" class="room-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition text-left text-slate-300 hover:bg-slate-800/60" data-room="ai-orchestration">
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-500 font-bold">#</span>
+                        <span>ai-orchestration</span>
+                    </div>
+                </button>
+                <button onclick="switchRoom('bugs-and-fixes')" class="room-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition text-left text-slate-300 hover:bg-slate-800/60" data-room="bugs-and-fixes">
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-500 font-bold">#</span>
+                        <span>bugs-and-fixes</span>
+                    </div>
+                </button>
+            </div>
+
+            <!-- Developer Info Footer -->
+            <div class="p-3 border-t border-slate-800/80 bg-slate-950/40 text-[11px] text-slate-500 flex items-center justify-between">
+                <span>Free Tier ($0 Cloudflare & Firebase)</span>
+                <span class="text-indigo-400 font-mono">v1.0.0</span>
+            </div>
+        </aside>
+
+        <!-- Backdrop for mobile drawer -->
+        <div id="mobileBackdrop" class="hidden fixed inset-0 bg-black/60 z-10 md:hidden backdrop-blur-xs"></div>
+
+        <!-- Chat Main Area -->
+        <main class="flex-1 flex flex-col bg-slate-950 overflow-hidden relative">
+
+            <!-- Message Feed Container -->
+            <div id="messagesFeed" class="flex-1 overflow-y-auto p-4 space-y-4 select-text">
+                <!-- System Welcome Greeting -->
+                <div class="max-w-xl mx-auto my-6 p-4 rounded-xl bg-slate-900/80 border border-slate-800 text-center shadow-lg">
+                    <div class="text-2xl mb-1">👋</div>
+                    <h3 class="text-sm font-bold text-slate-200">Welcome to #<span class="welcome-room-name">general</span></h3>
+                    <p class="text-xs text-slate-400 mt-1">This is the start of the persistent room history. Messages sent here are stored in Firebase Realtime Database in real-time.</p>
+                </div>
+
+                <!-- Messages will be dynamically rendered here -->
+            </div>
+
+            <!-- Quick Emoji Bar -->
+            <div class="px-4 py-1.5 bg-slate-900/50 border-t border-slate-800/60 flex items-center gap-2 overflow-x-auto text-sm shrink-0">
+                <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider shrink-0">Emojis:</span>
+                <div class="flex items-center gap-1.5">
+                    <button type="button" class="emoji-btn hover:scale-125 transition p-1" onclick="insertEmoji('👍')">👍</button>
+                    <button type="button" class="emoji-btn hover:scale-125 transition p-1" onclick="insertEmoji('🚀')">🚀</button>
+                    <button type="button" class="emoji-btn hover:scale-125 transition p-1" onclick="insertEmoji('🔥')">🔥</button>
+                    <button type="button" class="emoji-btn hover:scale-125 transition p-1" onclick="insertEmoji('💻')">💻</button>
+                    <button type="button" class="emoji-btn hover:scale-125 transition p-1" onclick="insertEmoji('⛏️')">⛏️</button>
+                    <button type="button" class="emoji-btn hover:scale-125 transition p-1" onclick="insertEmoji('🛠️')">🛠️</button>
+                    <button type="button" class="emoji-btn hover:scale-125 transition p-1" onclick="insertEmoji('🎮')">🎮</button>
+                    <button type="button" class="emoji-btn hover:scale-125 transition p-1" onclick="insertEmoji('🎉')">🎉</button>
+                    <button type="button" class="emoji-btn hover:scale-125 transition p-1" onclick="insertEmoji('👀')">👀</button>
+                    <button type="button" class="emoji-btn hover:scale-125 transition p-1" onclick="insertEmoji('✨')">✨</button>
+                    <button type="button" class="emoji-btn hover:scale-125 transition p-1" onclick="insertEmoji('❤️')">❤️</button>
+                    <button type="button" class="emoji-btn hover:scale-125 transition p-1" onclick="insertEmoji('😂')">😂</button>
+                </div>
+            </div>
+
+            <!-- Message Input Area -->
+            <div class="p-3 sm:p-4 bg-slate-900/90 border-t border-slate-800 shrink-0">
+                <form id="messageForm" class="flex flex-col gap-2">
+                    <div class="relative flex items-end gap-2 bg-slate-950 border border-slate-700/80 rounded-xl p-2 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500/30 transition shadow-inner">
+                        <textarea 
+                            id="messageInput" 
+                            rows="1" 
+                            maxlength="500"
+                            placeholder="Message #general... (Press Enter to send, Shift+Enter for new line)" 
+                            class="flex-1 bg-transparent text-sm text-slate-100 placeholder-slate-500 focus:outline-none resize-none leading-relaxed py-1 px-1.5 min-h-[36px]"
+                        ></textarea>
+                        
+                        <div class="flex items-center gap-2 shrink-0">
+                            <!-- Character Counter -->
+                            <span id="charCounter" class="text-[11px] font-mono text-slate-500 tabular-nums">0/500</span>
+
+                            <!-- Send Button -->
+                            <button 
+                                type="submit" 
+                                id="btnSend" 
+                                class="p-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white transition active:scale-95 shadow-md shadow-indigo-600/20"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- PROFILE MODAL -->
+    <div id="profileModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="w-full max-w-sm rounded-2xl bg-slate-900 border border-slate-800 p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <span>👤</span> Developer Profile
+                </h3>
+                <button onclick="closeModal('profileModal')" class="text-slate-400 hover:text-white text-lg">✕</button>
+            </div>
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Display Handle</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="inputProfileName" maxlength="30" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                        <button type="button" onclick="randomizeHandle()" title="Generate Random Handle" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-indigo-400 border border-slate-700 font-semibold transition">
+                            🎲 Roll
+                        </button>
+                    </div>
+                    <span class="text-[11px] text-slate-500 mt-1 block">Your handle is displayed on messages you post.</span>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Anonymous User ID</label>
+                    <input type="text" id="inputUserId" readonly class="w-full bg-slate-950/60 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-500 select-all cursor-default">
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2">
+                <button type="button" onclick="closeModal('profileModal')" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-white bg-slate-800 transition">Cancel</button>
+                <button type="button" onclick="saveProfile()" class="px-4 py-2 rounded-lg text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 transition shadow">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW ROOM MODAL -->
+    <div id="newRoomModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="w-full max-w-sm rounded-2xl bg-slate-900 border border-slate-800 p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <span>#</span> Join or Create Room
+                </h3>
+                <button onclick="closeModal('newRoomModal')" class="text-slate-400 hover:text-white text-lg">✕</button>
+            </div>
+            
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Room Name</label>
+                <input type="text" id="inputNewRoom" placeholder="e.g. stage-3-cavern" maxlength="30" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                <span class="text-[11px] text-slate-500 mt-1 block">Letters, numbers, and dashes only. Room will be created automatically.</span>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2">
+                <button type="button" onclick="closeModal('newRoomModal')" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-white bg-slate-800 transition">Cancel</button>
+                <button type="button" onclick="confirmNewRoom()" class="px-4 py-2 rounded-lg text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 transition shadow">Join Room</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE CONFIGURATION MODAL -->
+    <div id="configModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="w-full max-w-md rounded-2xl bg-slate-900 border border-slate-800 p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <span>🔥</span> Firebase Credentials ($0 Setup)
+                </h3>
+                <button onclick="closeModal('configModal')" class="text-slate-400 hover:text-white text-lg">✕</button>
+            </div>
+
+            <p class="text-xs text-slate-400 leading-relaxed">
+                Enter your Firebase Realtime Database project credentials below. Stored securely in your browser's <code class="text-indigo-400">localStorage</code>.
+            </p>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-400 mb-1">Database URL (Required)</label>
+                    <input type="text" id="cfgDbUrl" placeholder="https://your-project-default-rtdb.firebaseio.com" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-400 mb-1">API Key</label>
+                    <input type="text" id="cfgApiKey" placeholder="AIzaSy..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-400 mb-1">Auth Domain</label>
+                    <input type="text" id="cfgAuthDomain" placeholder="your-project.firebaseapp.com" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-400 mb-1">Project ID</label>
+                    <input type="text" id="cfgProjectId" placeholder="your-project" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-400 mb-1">App ID</label>
+                    <input type="text" id="cfgAppId" placeholder="1:123456789:web:abcdef..." class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-indigo-500">
+                </div>
+            </div>
+
+            <!-- Pre-configured Mock / Demo button -->
+            <div class="pt-2 flex items-center justify-between">
+                <button type="button" onclick="loadDemoConfig()" class="text-xs text-indigo-400 hover:text-indigo-300 underline">
+                    Load Demo / Fallback Config
+                </button>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+                <button type="button" onclick="closeModal('configModal')" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-white bg-slate-800 transition">Cancel</button>
+                <button type="button" onclick="saveFirebaseConfig()" class="px-4 py-2 rounded-lg text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 transition shadow">Save & Reconnect</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-2 bg-slate-800 border border-slate-700 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-2xl">
+        <span id="toastIcon">📋</span>
+        <span id="toastMessage">Link copied to clipboard!</span>
+    </div>
+
+    <!-- FIREBASE SDK & APPLICATION LOGIC (ES MODULE) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getDatabase, ref, push, set, onChildAdded, onValue, query, limitToLast, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+        // Global State
+        let app = null;
+        let auth = null;
+        let db = null;
+        let currentUser = null;
+        let currentRoom = getRoomFromUrl();
+        let messagesUnsubscribe = null;
+        let activeRoomRef = null;
+
+        // Fun Handle Dictionaries
+        const ADJECTIVES = [
+            "Cosmic", "Neon", "Cyber", "Quantum", "Turbo", "Solar", "Astro", "Hyper",
+            "Shadow", "Pixel", "Iron", "Vortex", "Apex", "Echo", "Prism", "Glitch",
+            "Phantom", "Blaze", "Stellar", "Titan", "Thunder", "Omega", "Sonic", "Matrix"
+        ];
+        const NOUNS = [
+            "Falcon", "Samurai", "Wizard", "Fox", "Builder", "Knight", "Miner", "Gamer",
+            "Coder", "Hacker", "Architect", "Pilot", "Scout", "Ninja", "Striker", "Engineer",
+            "Ghost", "Hunter", "Voyager", "Ranger", "Pioneer", "Captain", "Oracle", "Spark"
+        ];
+
+        // Sound Effects Engine via Web Audio API (Synthesizer Chime)
+        class SoundEngine {
+            constructor() {
+                this.ctx = null;
+                this.muted = localStorage.getItem('devchat_muted') === 'true';
+                this.updateUI();
+            }
+            init() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) this.ctx = new AudioCtx();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+            playChime() {
+                if (this.muted) return;
+                try {
+                    this.init();
+                    if (!this.ctx) return;
+                    const now = this.ctx.currentTime;
+                    
+                    // Dual-frequency chord (E5: 659.25Hz -> A5: 880Hz)
+                    const osc1 = this.ctx.createOscillator();
+                    const gain1 = this.ctx.createGain();
+                    osc1.type = 'sine';
+                    osc1.frequency.setValueAtTime(659.25, now);
+                    gain1.gain.setValueAtTime(0, now);
+                    gain1.gain.linearRampToValueAtTime(0.12, now + 0.02);
+                    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+                    osc1.connect(gain1);
+                    gain1.connect(this.ctx.destination);
+                    osc1.start(now);
+                    osc1.stop(now + 0.3);
+
+                    const osc2 = this.ctx.createOscillator();
+                    const gain2 = this.ctx.createGain();
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(880, now + 0.08);
+                    gain2.gain.setValueAtTime(0, now + 0.08);
+                    gain2.gain.linearRampToValueAtTime(0.18, now + 0.1);
+                    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.42);
+                    osc2.connect(gain2);
+                    gain2.connect(this.ctx.destination);
+                    osc2.start(now + 0.08);
+                    osc2.stop(now + 0.45);
+                } catch (e) {
+                    console.warn("Audio chime prevented by browser policy", e);
+                }
+            }
+            toggle() {
+                this.muted = !this.muted;
+                localStorage.setItem('devchat_muted', this.muted);
+                this.updateUI();
+                showToast(this.muted ? "🔇 Sound muted" : "🔔 Sound notifications on", this.muted ? "🔇" : "🔔");
+            }
+            updateUI() {
+                const icon = document.getElementById("soundIcon");
+                if (icon) icon.textContent = this.muted ? "🔇" : "🔔";
+            }
+        }
+
+        const sound = new SoundEngine();
+
+        // Helper: URL Parameter Room Router
+        function getRoomFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            let room = params.get("room");
+            if (!room && window.location.hash) {
+                room = window.location.hash.replace("#", "");
+            }
+            return sanitizeRoomName(room || "general");
+        }
+
+        function sanitizeRoomName(name) {
+            return name.toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 30) || "general";
+        }
+
+        function setRoomUrl(room) {
+            const url = new URL(window.location);
+            url.searchParams.set("room", room);
+            window.history.pushState({}, "", url);
+        }
+
+        // Helper: Generate Random Handle
+        window.generateRandomHandle = function() {
+            const adj = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
+            const noun = NOUNS[Math.floor(Math.random() * NOUNS.length)];
+            const num = Math.floor(100 + Math.random() * 900);
+            return `${adj}${noun}_${num}`;
+        };
+
+        // Helper: Generate Avatar Color Gradient
+        function getAvatarGradient(name) {
+            const gradients = [
+                "from-indigo-500 to-purple-600",
+                "from-cyan-500 to-blue-600",
+                "from-emerald-500 to-teal-600",
+                "from-amber-500 to-orange-600",
+                "from-rose-500 to-pink-600",
+                "from-fuchsia-500 to-indigo-600",
+                "from-sky-500 to-indigo-500",
+                "from-violet-500 to-purple-700"
+            ];
+            let hash = 0;
+            for (let i = 0; i < (name || "").length; i++) {
+                hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            return gradients[Math.abs(hash) % gradients.length];
+        }
+
+        // XSS Sanitizer & Safe Link Formatter
+        function escapeHTML(str) {
+            const p = document.createElement('p');
+            p.textContent = str || "";
+            return p.innerHTML;
+        }
+
+        function formatMessageContent(rawText) {
+            const safe = escapeHTML(rawText);
+            const urlPattern = /(\b(https?):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+            return safe.replace(urlPattern, '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-indigo-400 hover:text-indigo-300 underline break-all font-mono text-xs">$1</a>');
+        }
+
+        // Time Formatter
+        function formatTime(timestamp) {
+            if (!timestamp) return "";
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // Toast Notification Display
+        window.showToast = function(msg, icon = "📋") {
+            const toast = document.getElementById("toast");
+            const toastIcon = document.getElementById("toastIcon");
+            const toastMsg = document.getElementById("toastMessage");
+            toastIcon.textContent = icon;
+            toastMsg.textContent = msg;
+            toast.classList.remove("translate-y-20", "opacity-0");
+            setTimeout(() => {
+                toast.classList.add("translate-y-20", "opacity-0");
+            }, 2500);
+        };
+
+        // Initialize / Load Firebase Configuration
+        function getStoredFirebaseConfig() {
+            const stored = localStorage.getItem("devchat_firebase_config");
+            if (stored) {
+                try { return JSON.parse(stored); } catch (e) {}
+            }
+            // Working demo fallback configuration
+            return {
+                apiKey: "AIzaSyDemoPlaceholderKeyForLocalUI",
+                authDomain: "pet-mining-empire-chat.firebaseapp.com",
+                databaseURL: "https://pet-mining-empire-chat-default-rtdb.firebaseio.com",
+                projectId: "pet-mining-empire-chat",
+                appId: "1:100000000000:web:abcdef123456"
+            };
+        }
+
+        // Initialize Firebase Services
+        async function setupFirebase() {
+            const config = getStoredFirebaseConfig();
+            updateConnectionStatus("connecting");
+
+            try {
+                app = initializeApp(config);
+                auth = getAuth(app);
+                db = getDatabase(app);
+
+                // Setup anonymous authentication
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        currentUser = user;
+                        let displayName = localStorage.getItem("devchat_display_name");
+                        if (!displayName) {
+                            displayName = generateRandomHandle();
+                            localStorage.setItem("devchat_display_name", displayName);
+                        }
+                        updateUserUI(displayName, user.uid);
+                        listenToRoomMessages(currentRoom);
+                    } else {
+                        try {
+                            await signInAnonymously(auth);
+                        } catch (authErr) {
+                            console.warn("Anonymous auth failed, running in local fallback mode:", authErr);
+                            setupLocalFallback();
+                        }
+                    }
+                });
+
+                // Monitor Realtime Database connection status
+                const connectedRef = ref(db, ".info/connected");
+                onValue(connectedRef, (snap) => {
+                    if (snap.val() === true) {
+                        updateConnectionStatus("online");
+                    } else {
+                        updateConnectionStatus("offline");
+                    }
+                });
+
+            } catch (err) {
+                console.warn("Firebase initialization failed:", err);
+                setupLocalFallback();
+            }
+        }
+
+        function setupLocalFallback() {
+            updateConnectionStatus("offline");
+            let displayName = localStorage.getItem("devchat_display_name") || generateRandomHandle();
+            currentUser = { uid: "local_" + Math.random().toString(36).substring(2, 9) };
+            updateUserUI(displayName, currentUser.uid);
+            renderLocalMessages();
+        }
+
+        function updateConnectionStatus(status) {
+            const badge = document.getElementById("connectionBadge");
+            const text = document.getElementById("connectionText");
+            if (status === "online") {
+                badge.className = "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+                badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-online"></span><span>Online</span>';
+            } else if (status === "connecting") {
+                badge.className = "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20";
+                badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span><span>Connecting...</span>';
+            } else {
+                badge.className = "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20";
+                badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span><span>Offline (Local)</span>';
+            }
+        }
+
+        function updateUserUI(name, uid) {
+            document.getElementById("userNameLabel").textContent = name;
+            document.getElementById("userAvatarSmall").textContent = name.charAt(0);
+            document.getElementById("userAvatarSmall").className = `w-6 h-6 rounded-full bg-gradient-to-tr ${getAvatarGradient(name)} flex items-center justify-center text-[10px] font-bold text-white uppercase shadow-sm`;
+            document.getElementById("inputProfileName").value = name;
+            document.getElementById("inputUserId").value = uid;
+        }
+
+        // Room Navigation & Subscriptions
+        window.switchRoom = function(newRoom) {
+            const cleanRoom = sanitizeRoomName(newRoom);
+            if (cleanRoom === currentRoom) return;
+
+            currentRoom = cleanRoom;
+            setRoomUrl(currentRoom);
+            updateRoomUI();
+
+            // Clear feed and listen to new room
+            const feed = document.getElementById("messagesFeed");
+            feed.innerHTML = `
+                <div class="max-w-xl mx-auto my-6 p-4 rounded-xl bg-slate-900/80 border border-slate-800 text-center shadow-lg">
+                    <div class="text-2xl mb-1">#</div>
+                    <h3 class="text-sm font-bold text-slate-200">Welcome to #${cleanRoom}</h3>
+                    <p class="text-xs text-slate-400 mt-1">This is the start of the #${cleanRoom} room history.</p>
+                </div>
+            `;
+
+            listenToRoomMessages(currentRoom);
+
+            // Close mobile drawer if open
+            closeMobileDrawer();
+        };
+
+        function updateRoomUI() {
+            document.getElementById("activeRoomName").textContent = currentRoom;
+            document.querySelectorAll(".welcome-room-name").forEach(el => el.textContent = currentRoom);
+            document.getElementById("messageInput").placeholder = `Message #${currentRoom}... (Press Enter to send)`;
+
+            // Update active state in room buttons
+            document.querySelectorAll(".room-btn").forEach(btn => {
+                if (btn.getAttribute("data-room") === currentRoom) {
+                    btn.className = "room-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold transition text-left text-white bg-indigo-600/20 border border-indigo-500/30";
+                } else {
+                    btn.className = "room-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition text-left text-slate-300 hover:bg-slate-800/60";
+                }
+            });
+        }
+
+        // Listen for Realtime Messages in Current Room
+        function listenToRoomMessages(room) {
+            if (!db) return;
+
+            const roomMessagesRef = query(ref(db, `rooms/${room}/messages`), limitToLast(100));
+            
+            // Listen to each incoming child
+            onChildAdded(roomMessagesRef, (snapshot) => {
+                const msg = snapshot.val();
+                if (msg) {
+                    renderMessage(msg, snapshot.key);
+                    // Play sound if message is from another developer
+                    if (currentUser && msg.userId !== currentUser.uid) {
+                        sound.playChime();
+                    }
+                }
+            });
+        }
+
+        // Local Storage Fallback for Offline / Demo Testing
+        function renderLocalMessages() {
+            const feed = document.getElementById("messagesFeed");
+            const localKey = `devchat_local_msgs_${currentRoom}`;
+            const msgs = JSON.parse(localStorage.getItem(localKey)) || [
+                {
+                    userId: "bot",
+                    userName: "SystemBot",
+                    text: "Welcome to the DevHub Chat! Configure your Firebase credentials in the ⚙️ settings menu to chat across devices.",
+                    timestamp: Date.now() - 60000
+                }
+            ];
+            msgs.forEach(m => renderMessage(m));
+        }
+
+        // Append Message to UI Feed
+        function renderMessage(msg, key = null) {
+            const feed = document.getElementById("messagesFeed");
+            const isMe = currentUser && msg.userId === currentUser.uid;
+
+            const row = document.createElement("div");
+            row.className = `flex gap-3 max-w-2xl ${isMe ? 'ml-auto flex-row-reverse' : ''}`;
+            
+            const avatarGrad = getAvatarGradient(msg.userName || "Dev");
+            const initial = (msg.userName || "?").charAt(0).toUpperCase();
+
+            row.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr ${avatarGrad} flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-md">
+                    ${initial}
+                </div>
+                <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-xs font-bold ${isMe ? 'text-indigo-400' : 'text-slate-300'}">${escapeHTML(msg.userName || "Developer")}</span>
+                        <span class="text-[10px] text-slate-500 font-mono">${formatTime(msg.timestamp)}</span>
+                    </div>
+                    <div class="rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-sm break-words max-w-full ${
+                        isMe 
+                            ? 'bg-indigo-600 text-white rounded-tr-xs' 
+                            : 'bg-slate-900 border border-slate-800 text-slate-200 rounded-tl-xs'
+                    }">
+                        ${formatMessageContent(msg.text)}
+                    </div>
+                </div>
+            `;
+
+            feed.appendChild(row);
+            feed.scrollTop = feed.scrollHeight;
+        }
+
+        // Send Message
+        async function sendMessage() {
+            const input = document.getElementById("messageInput");
+            const text = input.value.trim();
+            if (!text || text.length > 500) return;
+
+            const displayName = localStorage.getItem("devchat_display_name") || "Developer";
+            const messageData = {
+                userId: currentUser ? currentUser.uid : "anon",
+                userName: displayName,
+                text: text,
+                timestamp: Date.now()
+            };
+
+            input.value = "";
+            document.getElementById("charCounter").textContent = "0/500";
+            input.style.height = "auto";
+
+            if (db && currentUser && auth.currentUser) {
+                try {
+                    const roomRef = ref(db, `rooms/${currentRoom}/messages`);
+                    await push(roomRef, messageData);
+                } catch (e) {
+                    console.warn("Failed to push to Firebase, storing locally:", e);
+                    saveLocalMessage(messageData);
+                }
+            } else {
+                saveLocalMessage(messageData);
+            }
+        }
+
+        function saveLocalMessage(msg) {
+            const localKey = `devchat_local_msgs_${currentRoom}`;
+            const msgs = JSON.parse(localStorage.getItem(localKey)) || [];
+            msgs.push(msg);
+            localStorage.setItem(localKey, JSON.stringify(msgs.slice(-100)));
+            renderMessage(msg);
+        }
+
+        // Quick Emoji Click Handler
+        window.insertEmoji = function(emoji) {
+            const input = document.getElementById("messageInput");
+            input.value += emoji;
+            input.focus();
+            document.getElementById("charCounter").textContent = `${input.value.length}/500`;
+        };
+
+        // Form Submission & Key Events
+        const messageForm = document.getElementById("messageForm");
+        const messageInput = document.getElementById("messageInput");
+
+        messageForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            sendMessage();
+        });
+
+        messageInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        messageInput.addEventListener("input", () => {
+            document.getElementById("charCounter").textContent = `${messageInput.value.length}/500`;
+            if (messageInput.value.length >= 480) {
+                document.getElementById("charCounter").className = "text-[11px] font-mono text-rose-400 font-bold tabular-nums";
+            } else {
+                document.getElementById("charCounter").className = "text-[11px] font-mono text-slate-500 tabular-nums";
+            }
+        });
+
+        // Copy Shareable Link Action
+        document.getElementById("btnShareLink").addEventListener("click", () => {
+            const shareUrl = `${window.location.origin}${window.location.pathname}?room=${currentRoom}`;
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                showToast(`Share link copied for #${currentRoom}!`, "🔗");
+            }).catch(() => {
+                showToast("Failed to copy link", "⚠️");
+            });
+        });
+
+        // Sound Toggle Action
+        document.getElementById("btnSoundToggle").addEventListener("click", () => {
+            sound.toggle();
+        });
+
+        // Modal Open / Close Handlers
+        window.openModal = function(id) {
+            document.getElementById(id).classList.remove("hidden");
+        };
+
+        window.closeModal = function(id) {
+            document.getElementById(id).classList.add("hidden");
+        };
+
+        document.getElementById("btnProfileModal").addEventListener("click", () => openModal("profileModal"));
+        document.getElementById("btnConfigModal").addEventListener("click", () => {
+            const cfg = getStoredFirebaseConfig();
+            document.getElementById("cfgDbUrl").value = cfg.databaseURL || "";
+            document.getElementById("cfgApiKey").value = cfg.apiKey || "";
+            document.getElementById("cfgAuthDomain").value = cfg.authDomain || "";
+            document.getElementById("cfgProjectId").value = cfg.projectId || "";
+            document.getElementById("cfgAppId").value = cfg.appId || "";
+            openModal("configModal");
+        });
+
+        document.getElementById("btnNewRoom").addEventListener("click", () => {
+            document.getElementById("inputNewRoom").value = "";
+            openModal("newRoomModal");
+        });
+
+        window.randomizeHandle = function() {
+            document.getElementById("inputProfileName").value = generateRandomHandle();
+        };
+
+        window.saveProfile = function() {
+            const name = document.getElementById("inputProfileName").value.trim();
+            if (name) {
+                localStorage.setItem("devchat_display_name", name);
+                updateUserUI(name, currentUser ? currentUser.uid : "anon");
+                closeModal("profileModal");
+                showToast("Profile handle updated!", "👤");
+            }
+        };
+
+        window.confirmNewRoom = function() {
+            const roomName = document.getElementById("inputNewRoom").value.trim();
+            if (roomName) {
+                closeModal("newRoomModal");
+                switchRoom(roomName);
+            }
+        };
+
+        window.loadDemoConfig = function() {
+            document.getElementById("cfgDbUrl").value = "https://pet-mining-empire-chat-default-rtdb.firebaseio.com";
+            document.getElementById("cfgApiKey").value = "AIzaSyDemoKeyFreeBudgetFirebase";
+            document.getElementById("cfgAuthDomain").value = "pet-mining-empire-chat.firebaseapp.com";
+            document.getElementById("cfgProjectId").value = "pet-mining-empire-chat";
+            document.getElementById("cfgAppId").value = "1:100000000000:web:abcdef123456";
+        };
+
+        window.saveFirebaseConfig = function() {
+            const config = {
+                databaseURL: document.getElementById("cfgDbUrl").value.trim(),
+                apiKey: document.getElementById("cfgApiKey").value.trim(),
+                authDomain: document.getElementById("cfgAuthDomain").value.trim(),
+                projectId: document.getElementById("cfgProjectId").value.trim(),
+                appId: document.getElementById("cfgAppId").value.trim(),
+            };
+            localStorage.setItem("devchat_firebase_config", JSON.stringify(config));
+            closeModal("configModal");
+            showToast("Credentials saved! Reconnecting...", "🔄");
+            setTimeout(() => window.location.reload(), 600);
+        };
+
+        // Mobile Drawer Management
+        const roomSidebar = document.getElementById("roomSidebar");
+        const mobileBackdrop = document.getElementById("mobileBackdrop");
+        const btnMobileRoomToggle = document.getElementById("btnMobileRoomToggle");
+
+        btnMobileRoomToggle.addEventListener("click", () => {
+            roomSidebar.classList.remove("-translate-x-full");
+            mobileBackdrop.classList.remove("hidden");
+        });
+
+        mobileBackdrop.addEventListener("click", closeMobileDrawer);
+
+        function closeMobileDrawer() {
+            roomSidebar.classList.add("-translate-x-full");
+            mobileBackdrop.classList.add("hidden");
+        }
+
+        // Initialize UI & Firebase
+        updateRoomUI();
+        setupFirebase();
+    </script>
+</body>
+</html>
