@@ -43,7 +43,7 @@ class TestAntigravityControlCenter(unittest.TestCase):
             "--port", str(TEST_PORT),
             "--auth-key", TEST_AUTH_KEY
         ]
-        cls.server_proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        cls.server_proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         time.sleep(1.5) # Wait for socket to bind
 
     @classmethod
@@ -53,15 +53,22 @@ class TestAntigravityControlCenter(unittest.TestCase):
             cls.server_proc.terminate()
             cls.server_proc.wait(timeout=5)
 
-    def _request(self, method, endpoint, data=None, auth_header=True):
+    def _request(self, method, endpoint, data=None, auth_header=True, token=None):
         """Helper to send HTTP requests to test server."""
         url = f"{BASE_URL}{endpoint}"
         req = urllib.request.Request(url, method=method)
         req.add_header("Content-Type", "application/json")
-        if auth_header:
+        if token is not None:
+            req.add_header("Authorization", f"Bearer {token}")
+        elif auth_header:
             req.add_header("Authorization", f"Bearer {TEST_AUTH_KEY}")
         
-        body_bytes = json.dumps(data).encode("utf-8") if data else None
+        if data is not None:
+            body_bytes = json.dumps(data).encode("utf-8")
+        elif method in ["POST", "PUT"]:
+            body_bytes = b"{}"
+        else:
+            body_bytes = None
         try:
             with urllib.request.urlopen(req, data=body_bytes, timeout=5) as res:
                 body = res.read().decode("utf-8")
@@ -262,6 +269,169 @@ class TestAntigravityControlCenter(unittest.TestCase):
         })
         self.assertEqual(code, 200)
         self.assertEqual(comp_res["task"]["status"], "completed")
+
+    # -------------------------------------------------------------
+    # Task 1.64 Multi-Developer & Backlog Test Suite
+    # -------------------------------------------------------------
+
+    # Test 10: Multi-Developer Auth & Role Verification
+    def test_10_multi_developer_auth_and_roles(self):
+        # Test Lead Auth
+        code, lead_res = self._request("POST", "/api/auth/verify", token="agy_lead_key_2026")
+        self.assertEqual(code, 200)
+        self.assertEqual(lead_res["user"]["role"], "lead")
+        self.assertEqual(lead_res["user"]["id"], "dev_lead")
+
+        # Test Dev 1 Auth
+        code, dev1_res = self._request("POST", "/api/auth/verify", token="agy_dev1_key_2026")
+        self.assertEqual(code, 200)
+        self.assertEqual(dev1_res["user"]["role"], "developer")
+        self.assertEqual(dev1_res["user"]["id"], "dev_1")
+
+        # Test Developers list endpoint
+        code, list_devs = self._request("GET", "/api/developers", token="agy_lead_key_2026")
+        self.assertEqual(code, 200)
+        dev_ids = [d["id"] for d in list_devs["developers"]]
+        self.assertIn("dev_lead", dev_ids)
+        self.assertIn("dev_1", dev_ids)
+        self.assertIn("dev_2", dev_ids)
+
+    # Test 11: Backlog Propose, Assign & Accept Lifecycle
+    def test_11_backlog_lifecycle(self):
+        # 1. Dev 1 proposes a task
+        code, prop_res = self._request("POST", "/api/backlog/propose", {
+            "title": "Add Compass HUD Direction Indicator",
+            "description": "Render N/S/E/W markers on top center HUD.",
+            "priority": "P2",
+            "category": "UI & HUD",
+            "exclusive_resources": ["File:UIController.luau"]
+        }, token="agy_dev1_key_2026")
+        self.assertEqual(code, 201)
+        item_id = prop_res["item"]["id"]
+        self.assertEqual(prop_res["item"]["status"], "proposed")
+
+        # 2. Non-lead cannot accept
+        code, err_accept = self._request("POST", f"/api/backlog/{item_id}/accept", token="agy_dev1_key_2026")
+        self.assertEqual(code, 403)
+
+        # 3. Lead accepts into backlog
+        code, ok_accept = self._request("POST", f"/api/backlog/{item_id}/accept", token="agy_lead_key_2026")
+        self.assertEqual(code, 200)
+        self.assertEqual(ok_accept["item"]["status"], "backlog")
+
+        # 4. Assign to dev_1
+        code, assign_res = self._request("POST", f"/api/backlog/{item_id}/assign", {
+            "assigned_dev": "dev_1",
+            "branch": "feature/hud-compass"
+        }, token="agy_lead_key_2026")
+        self.assertEqual(code, 200)
+        self.assertEqual(assign_res["item"]["status"], "assigned")
+        self.assertEqual(assign_res["item"]["assigned_dev"], "dev_1")
+
+        # 5. Add decision comment
+        code, comm_res = self._request("POST", f"/api/backlog/{item_id}/comment", {
+            "comment": "Approved design wireframe in Figma."
+        }, token="agy_dev1_key_2026")
+        self.assertEqual(code, 200)
+        self.assertTrue(any("Approved design wireframe" in log for log in comm_res["item"]["decision_log"]))
+
+    # Test 12: Exclusive Resource Conflict Prevention
+    def test_12_exclusive_resource_conflict(self):
+        test_res = f"RobloxStudio:LivePlace_{int(time.time()*1000)}"
+
+        # Create Task A with exclusive lock on test_res
+        code, sub_a = self._request("POST", "/api/tasks/submit", {
+            "title": "Live Place Geometry Rebuild",
+            "prompt": "Inspect and rebuild world geometry.",
+            "mode": "plan-first",
+            "exclusive_resources": [test_res]
+        }, token="agy_lead_key_2026")
+        self.assertEqual(code, 201)
+        task_a_id = sub_a["task"]["id"]
+
+        # Claim Task A so it is actively running
+        code, claim_a = self._request("POST", f"/api/tasks/{task_a_id}/claim", token="agy_lead_key_2026")
+        self.assertEqual(code, 200)
+
+        # Verify active lock is reported
+        code, locks_res = self._request("GET", "/api/locks", token="agy_lead_key_2026")
+        self.assertEqual(code, 200)
+        self.assertIn(test_res, locks_res["active_locks"])
+        self.assertEqual(locks_res["active_locks"][test_res]["held_by_task"], task_a_id)
+
+        # Create Task B also requesting test_res
+        code, sub_b = self._request("POST", "/api/tasks/submit", {
+            "title": "Quarry Lighting Adjustment",
+            "prompt": "Adjust lighting in live quarry.",
+            "mode": "plan-first",
+            "exclusive_resources": [test_res]
+        }, token="agy_dev2_key_2026")
+        self.assertEqual(code, 201)
+        task_b_id = sub_b["task"]["id"]
+
+        # Attempting to claim Task B must fail with 409 Conflict
+        code, claim_b = self._request("POST", f"/api/tasks/{task_b_id}/claim", token="agy_dev2_key_2026")
+        self.assertEqual(code, 409)
+        self.assertIn("conflicts", claim_b)
+
+        # Complete Task A
+        self._request("POST", f"/api/tasks/{task_a_id}/status", {"status": "completed"}, token="agy_lead_key_2026")
+
+        # Now Task B can be claimed successfully
+        code, claim_b_retry = self._request("POST", f"/api/tasks/{task_b_id}/claim", token="agy_dev2_key_2026")
+        self.assertEqual(code, 200)
+
+        # Clean up Task B
+        self._request("POST", f"/api/tasks/{task_b_id}/status", {"status": "completed"}, token="agy_dev2_key_2026")
+
+    # Test 13: Approval Gating Enforcement
+    def test_13_approval_gating(self):
+        # Submit a task in execute mode requiring approval
+        code, sub = self._request("POST", "/api/tasks/submit", {
+            "title": "Critical DataStore Migration",
+            "prompt": "Migrate player progression schema.",
+            "mode": "execute",
+            "require_approval": True
+        }, token="agy_dev2_key_2026")
+        self.assertEqual(code, 201)
+        task_id = sub["task"]["id"]
+
+        # Claiming unapproved task must return 403 Forbidden
+        code, claim_err = self._request("POST", f"/api/tasks/{task_id}/claim", token="agy_dev2_key_2026")
+        self.assertEqual(code, 403)
+        self.assertIn("Approval Required", claim_err.get("error", ""))
+
+        # Non-lead cannot approve
+        code, app_err = self._request("POST", f"/api/tasks/{task_id}/approve", token="agy_dev1_key_2026")
+        self.assertEqual(code, 403)
+
+        # Lead approves
+        code, app_ok = self._request("POST", f"/api/tasks/{task_id}/approve", token="agy_lead_key_2026")
+        self.assertEqual(code, 200)
+        self.assertTrue(app_ok["task"]["approval"]["approved"])
+
+        # Now claim succeeds
+        code, claim_ok = self._request("POST", f"/api/tasks/{task_id}/claim", token="agy_dev2_key_2026")
+        self.assertEqual(code, 200)
+
+    # Test 14: Project Lead Agent Audit & Backlog Generation
+    def test_14_lead_agent_audit_generation(self):
+        code, res = self._request("POST", "/api/backlog/generate-audit", token="agy_lead_key_2026")
+        self.assertEqual(code, 200)
+        self.assertTrue(res["success"])
+        items = res["backlog"]
+        self.assertGreaterEqual(len(items), 5)
+
+        task_ids = [item["id"] for item in items]
+        self.assertIn("TASK-1.65", task_ids)
+        self.assertIn("TASK-1.66", task_ids)
+        self.assertIn("TASK-1.67", task_ids)
+
+        task_165 = next(i for i in items if i["id"] == "TASK-1.65")
+        self.assertEqual(task_165["priority"], "P0")
+        self.assertIn("TASK-1.63", task_165["dependencies"])
+        self.assertTrue(len(task_165["acceptance_criteria"]) >= 3)
+
 
 
 if __name__ == "__main__":

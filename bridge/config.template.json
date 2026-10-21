@@ -9,7 +9,27 @@
     ]
   },
   "auth": {
-    "auth_key": "REPLACE_WITH_YOUR_SECURE_AUTH_PASSPHRASE_OR_TOKEN"
+    "auth_key": "REPLACE_WITH_YOUR_SECURE_AUTH_PASSPHRASE_OR_TOKEN",
+    "developers": {
+      "REPLACE_WITH_LEAD_TOKEN": {
+        "id": "dev_lead",
+        "name": "Project Lead",
+        "role": "lead",
+        "agent": "Antigravity-Lead-IDE"
+      },
+      "REPLACE_WITH_DEV1_TOKEN": {
+        "id": "dev_1",
+        "name": "Frontend & UI Dev",
+        "role": "developer",
+        "agent": "Antigravity-Dev1-IDE"
+      },
+      "REPLACE_WITH_DEV2_TOKEN": {
+        "id": "dev_2",
+        "name": "Systems & Mining Dev",
+        "role": "developer",
+        "agent": "Antigravity-Dev2-IDE"
+      }
+    }
   },
   "bridge": {
     "auto_claim": false,

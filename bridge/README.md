@@ -1,115 +1,110 @@
-# Antigravity Web Prompt Local Bridge & Queue Engine
+# Antigravity Multi-Developer Bridge & Orchestration Engine
 
-This directory contains the local Windows bridge server for the **Antigravity Web Prompt Control Center** (Task 1.63).
+This directory contains the local Windows bridge server for the **Antigravity Multi-Developer Control Center & Project Backlog** (Tasks 1.63 & 1.64).
 
-It bridges the public GitHub Pages web interface (`https://wxstescripts.github.io/Roblox-Studio-AI/control-center/`) with the user's local Antigravity workflow on Windows.
+It bridges the public GitHub Pages web interface (`https://wxstescripts.github.io/Roblox-Studio-AI/control-center/`) with local Antigravity workflows across multiple team members on Windows.
 
 ---
 
 ## 1. Architecture & Execution Flow
 
 ```
-+-----------------------------------+
-|  GitHub Pages (Browser Client)    |
-|  /control-center/index.html       |
-+-----------------+-----------------+
-                  |  (1) Authenticated REST (Bearer Auth)
-                  v
-+-----------------+-----------------+
-|   Local Windows Bridge Server     |
-|   bridge/server.py (Port 8765)    |
-+--------+------------------+-------+
-         | (2) Queue Store  | (3) Safe Handoff
-         v                  v
-+--------+--------+  +------+------------------------------------------+
-|  .queue/        |  |  • Staged to .queue/staged_prompt.md            |
-|  • tasks.json   |  |  • Formatted prompt copied to Windows clipboard |
-|  • audit.log    |  |  • System notification chime / audio alert      |
-|  (Gitignored)   |  |  • Ready for instant paste into Antigravity IDE |
-+-----------------+  +-------------------------------------------------+
++-------------------------------------------------------------+
+|  GitHub Pages (Browser Client)                              |
+|  /control-center/index.html                                 |
+|  Multi-Developer Backlog Board & Queue UI                   |
++------------------------------+------------------------------+
+                               | (1) Authenticated REST (Bearer Auth per Developer)
+                               v
++-------------------------------------------------------------+
+|   Local Windows Bridge Server (bridge/server.py:8765)       |
+|   • Developer Identity & Role Check (Lead vs Developer)     |
+|   • Exclusive Resource Locks & Conflict Detection Engine     |
+|   • Approval Gating (Unapproved tasks blocked from execute) |
+|   • Project Lead Agent Audit & Backlog Generator            |
++---------------+------------------------------+--------------+
+                | (2) Queue & Backlog Store    | (3) Safe Handoff
+                v                              v
++---------------+---------------+  +-----------+-----------------------------------+
+|  .queue/                      |  |  • Staged to .queue/staged_prompt.md          |
+|  • tasks.json (Active queue)  |  |  • Prompt copied to Windows clipboard (clip)  |
+|  • backlog.json (Shared board)|  |  • System notification chime / audio alert    |
+|  • audit.log (Security trail) |  |  • Ready for instant paste into Antigravity   |
+|  (100% Gitignored)            |  +-----------------------------------------------+
++-------------------------------+
 ```
-
-### Why Manual Handoff via Clipboard / Staging?
-The installed Antigravity version on this host is the **Antigravity Desktop IDE** (`Antigravity.exe`), which operates as an interactive developer pair programmer. Standalone headless CLI binaries (`agy`) or global SDK modules (`google-antigravity`) with cloud API keys are not installed in the default environment.
-
-Rather than simulating headless execution with fragile window hooks, the bridge provides:
-1. **Zero Secret Leakage:** Prompts, queue data, and auth keys are kept on your local PC in `.queue/` and never written to public GitHub issues or public JSON files.
-2. **Instant Staging:** Claiming a task instantly writes the full prompt to `.queue/staged_prompt.md` and copies the text directly to your Windows clipboard.
-3. **One-Paste Delivery:** You simply press `Ctrl+V` into your active Antigravity chat window and hit Enter.
-4. **Status Feedback:** You or the bridge updates task status, logs, and links back to the website.
 
 ---
 
-## 2. Quickstart Instructions
+## 2. Multi-Developer Identity & Role Model
 
-### Starting the Bridge Locally
+The bridge enables multiple developers to coordinate without sharing personal AI subscriptions, API keys, or browser sessions:
 
-Run with Python 3:
+| Developer ID | Default Display Name | Role | Default Claiming Agent | Example Focus |
+| :--- | :--- | :---: | :--- | :--- |
+| `dev_lead` | Project Lead | `lead` | `Antigravity-Lead-IDE` | Architecture audits, backlog approvals, integration |
+| `dev_1` | Frontend & UI Dev | `developer` | `Antigravity-Dev1-IDE` | Responsive HUD, pet inventory, icons, UITheme |
+| `dev_2` | Systems & Mining Dev | `developer` | `Antigravity-Dev2-IDE` | Cavern mining, economy balance, server DataStore |
+
+### Role Permissions
+* **Project Lead (`lead`):** Can propose tasks, accept proposed tasks into active backlog, approve execution mode, trigger Lead Agent audits, and override lock warnings.
+* **Developer (`developer`):** Can propose tasks, claim assigned tasks, comment on decision logs, execute plan-first mode, and update task progress. Cannot approve execution of high-risk tasks without Lead sign-off.
+
+---
+
+## 3. Exclusive Resource Locking & Conflict Policy
+
+### The Roblox Studio Live Place Mutex
+Roblox Studio place `109317675035550` operates as a single live DataModel. Concurrent destructive edits to world assemblies or scripts within Studio can cause desynchronization or race conditions.
+* The bridge tracks exclusive resource locks: e.g., `RobloxStudio:LivePlace`, `File:MiningService.luau`, `File:PetConfig.luau`.
+* When a task claiming `RobloxStudio:LivePlace` is active, any other task attempting to claim the same resource is flagged with a **409 Conflict** error.
+* Code tasks targeting independent files (or run in isolated git branches) proceed concurrently without conflict.
+
+---
+
+## 4. REST API Endpoints
+
+### Public
+* `GET /api/health` — Bridge status, version, and server capabilities.
+
+### Authenticated (Bearer Token Required)
+* `POST /api/auth/verify` — Validates developer token and returns user profile.
+* `GET /api/developers` — Lists configured developer identities and roles.
+* `GET /api/locks` — Lists active exclusive resource locks and holders.
+* `GET /api/backlog` — Returns all shared backlog items annotated with conflict warnings.
+* `GET /api/backlog/<id>` — Returns specific backlog item details.
+* `POST /api/backlog/propose` — Proposes a new backlog task.
+* `POST /api/backlog/<id>/accept` — Accepts proposed task into active backlog (Lead only).
+* `POST /api/backlog/<id>/assign` — Assigns task to developer, branch, and agent.
+* `POST /api/backlog/<id>/comment` — Adds discussion comment or decision log.
+* `POST /api/backlog/generate-audit` — Runs Project Lead Agent audit and regenerates backlog.
+* `GET /api/tasks` — Lists active queue tasks.
+* `GET /api/tasks/<id>` — Retrieves specific queue task.
+* `POST /api/tasks/submit` — Enqueues prompt with conflict checks.
+* `POST /api/tasks/<id>/claim` — Claims task, stages to `.queue/staged_prompt.md`, copies to clipboard via `clip.exe`. Enforces approval gate.
+* `POST /api/tasks/<id>/approve` — Explicit Lead approval for execution mode.
+* `POST /api/tasks/<id>/status` — Updates status (`in_progress`, `completed`, `failed`).
+* `POST /api/tasks/<id>/cancel` — Cancels a task.
+* `GET /api/audit` — Returns recent security audit log trail.
+
+---
+
+## 5. Quickstart Instructions
 
 ```powershell
 # From the repository root:
 python bridge/server.py
 ```
 
-By default, the server runs on `http://127.0.0.1:8765` and will print a generated session auth key on first launch:
+Output:
 ```text
 ======================================================================
-Generated Session Auth Key: agy_4b8f3e2d1c9a0...
-Use this key in the Web Prompt Control Center interface.
+Antigravity Multi-Developer Bridge running at http://127.0.0.1:8765
+Queue Storage: C:\Users\heckz\Downloads\Roblox-Studio-AI\.queue\tasks.json
+Backlog Storage: C:\Users\heckz\Downloads\Roblox-Studio-AI\.queue\backlog.json
+Active Lead Key: agy_control_center_key_2026
 ======================================================================
+Bridge is ready to accept multi-developer prompt and backlog requests.
 ```
 
-### Custom Authentication Key
-
-You can pass a custom passkey using an argument or environment variable:
-
-```powershell
-python bridge/server.py --auth-key "my-secret-prompt-key"
-```
-
-Or set `BRIDGE_AUTH_KEY`:
-```powershell
-$env:BRIDGE_AUTH_KEY = "my-secret-prompt-key"
-python bridge/server.py
-```
-
-### Auto-Claiming Mode
-
-If you want the bridge to automatically claim incoming prompts, copy them to your clipboard, and notify you as soon as they arrive:
-
-```powershell
-python bridge/server.py --auto-claim
-```
-
----
-
-## 3. Remote / Mobile Access Options
-
-If you wish to submit prompts from your mobile phone or outside your home network, you can securely expose the bridge endpoint using a free Cloudflare Tunnel or local tunnel:
-
-### Option A: Free Cloudflare Tunnel (Recommended)
-1. Download `cloudflared` from [Cloudflare Releases](https://github.com/cloudflare/cloudflared/releases).
-2. Run a quick tunnel:
-   ```powershell
-   cloudflared tunnel --url http://localhost:8765
-   ```
-3. Copy the generated `https://<random>.trycloudflare.com` URL.
-4. Enter that URL in the **Backend URL** field in the Web Prompt Control Center on your phone!
-5. All traffic remains end-to-end encrypted and protected by your Bearer Auth Key.
-
----
-
-## 4. API Endpoints Reference
-
-| Method | Endpoint | Description | Auth Required |
-| :--- | :--- | :--- | :---: |
-| `GET` | `/api/health` | Health check & service status | No |
-| `POST` | `/api/auth/verify` | Validate auth key credentials | Yes |
-| `GET` | `/api/tasks` | List queued tasks (newest first) | Yes |
-| `GET` | `/api/tasks/<id>` | Full details & execution logs | Yes |
-| `POST` | `/api/tasks/submit` | Submit a new multiline task | Yes |
-| `POST` | `/api/tasks/<id>/claim` | Claim task & trigger clipboard handoff | Yes |
-| `POST` | `/api/tasks/<id>/approve` | Explicitly approve execution-mode task | Yes |
-| `POST` | `/api/tasks/<id>/status` | Update task status, logs & artifacts | Yes |
-| `POST` | `/api/tasks/<id>/cancel` | Cancel a pending/staged task | Yes |
-| `GET` | `/api/audit` | Read recent audit trail entries | Yes |
+Connect via the [Prompt Control Center](https://wxstescripts.github.io/Roblox-Studio-AI/control-center/).
